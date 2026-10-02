@@ -54,7 +54,12 @@ public class PlayerController : MonoBehaviour {
     private void Interact()     
     {
         Vector3 interactPos = transform.position + (Vector3)facingDir;
-        Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
+        //Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
+        var collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactiveLayer);
+        if (collider != null)
+        {
+            Debug.Log("There is an NPC here");
+        }
     }
 
     //Input
@@ -172,7 +177,7 @@ public class PlayerController : MonoBehaviour {
     {
         playerAnimation.SetBool("is_moving", moving);
 
-        if (moving && direction.sqrMagnitude > 0.25f)
+        if (moving && direction.sqrMagnitude > 0.01f)
         {
             facingDir = GetFacingDir(direction);
             playerAnimation.SetFloat("mx", direction.x);
