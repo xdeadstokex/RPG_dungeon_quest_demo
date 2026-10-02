@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour {
 
 	[Header("Collision")]
 	[SerializeField] private LayerMask solidObjectLayer;
+    [SerializeField] private LayerMask interactiveLayer;
 	[SerializeField] private float collisionCheckRadius;
 
     [Header("Input")]
@@ -45,8 +46,19 @@ public class PlayerController : MonoBehaviour {
             HandleStopMovement();
 
         wasMoving = isMoving;
+
+        if (Input.GetKeyDown(KeyCode.E))
+            Interact();
     }
 
+    private void Interact()     
+    {
+        var facingDir = new Vector3(playerAnimation.GetFloat("mx"), playerAnimation.GetFloat("my"));
+        Debug.Log(facingDir.ToString());
+        var interactPos = transform.position + facingDir;
+
+        Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
+    }
 
     //Input
     private Vector2 ReadBufferedInput(float dt)
@@ -121,7 +133,6 @@ public class PlayerController : MonoBehaviour {
 	}
 
     //Move and Collision
-
     //check each exis
     private bool TryMove(float dx, float dy)
     {
@@ -155,7 +166,7 @@ public class PlayerController : MonoBehaviour {
 
 	private bool IsWalkable(Vector3 targetPos)
 	{
-		if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectLayer))
+		if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectLayer | interactiveLayer))
 			return false;
 		return true;
 	}
