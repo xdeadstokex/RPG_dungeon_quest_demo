@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour {
 	private Vector2 lastActiveInput;
     private bool wasMoving = false;
     private bool isDecelerating;
-    //private Vector2 input;
+    private Vector2 facingDir = Vector2.down;
 
     private Animator playerAnimation;
 
@@ -53,10 +53,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Interact()     
     {
-        var facingDir = new Vector3(playerAnimation.GetFloat("mx"), playerAnimation.GetFloat("my"));
-        Debug.Log(facingDir.ToString());
-        var interactPos = transform.position + facingDir;
-
+        Vector3 interactPos = transform.position + (Vector3)facingDir;
         Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
     }
 
@@ -117,7 +114,6 @@ public class PlayerController : MonoBehaviour {
             elapsed += dt;
 
             float t = 1f - (elapsed / duration);
-            t += t;
 
             bool moved = TryMove(startVx * t * dt, startVy * t * dt);
 
@@ -176,11 +172,20 @@ public class PlayerController : MonoBehaviour {
     {
         playerAnimation.SetBool("is_moving", moving);
 
-        if (moving)
+        if (moving && direction.sqrMagnitude > 0.25f)
         {
+            facingDir = GetFacingDir(direction);
             playerAnimation.SetFloat("mx", direction.x);
             playerAnimation.SetFloat("my", direction.y);
         }
+    }
+
+    private Vector2 GetFacingDir(Vector2 direction)
+    {
+        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+            return new Vector2(Mathf.Sign(direction.x), 0);
+        else
+            return new Vector2(0, Mathf.Sign(direction.y));
     }
 
 
