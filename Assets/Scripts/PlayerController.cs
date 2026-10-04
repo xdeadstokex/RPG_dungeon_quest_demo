@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour {
 		playerAnimation = GetComponent<Animator>();
 	}
 
-    private void Update()
+    public void HandleUpdate()
     {
         float dt = Time.deltaTime;
         currentInput = ReadBufferedInput(dt);
