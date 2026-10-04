@@ -14,38 +14,38 @@ public class PlayerController : MonoBehaviour {
     public float transitionTimeSec = 1;
 
 	[Header("Collision")]
-	[SerializeField] private LayerMask solidObjectLayer;
-    [SerializeField] private LayerMask interactiveLayer;
-	[SerializeField] private float collisionCheckRadius;
+	[SerializeField] private LayerMask _solidObjectLayer;
+    [SerializeField] private LayerMask _interactiveLayer;
+	[SerializeField] private float _collisionCheckRadius;
 
     [Header("Input")]
     public float inputStopThreshold = 0.1f;
-    private float inputStopTimer = 0;
-	private Vector2 currentInput;
-	private Vector2 lastActiveInput;
-    private bool wasMoving = false;
-    private bool isDecelerating;
-    private Vector2 facingDir = Vector2.down;
+    private float _inputStopTimer = 0;
+	private Vector2 _currentInput; 
+	private Vector2 _lastActiveInput;
+    private bool _wasMoving = false;
+    private bool _isDecelerating;
+    private Vector2 _facingDir = Vector2.down;
 
-    private Animator playerAnimation;
+    private Animator _playerAnimation;
 
 
     private void Awake(){
-		playerAnimation = GetComponent<Animator>();
+		_playerAnimation = GetComponent<Animator>();
 	}
 
     public void HandleUpdate()
     {
         float dt = Time.deltaTime;
-        currentInput = ReadBufferedInput(dt);
-        bool isMoving = currentInput != Vector2.zero;
+        _currentInput = ReadBufferedInput(dt);
+        bool isMoving = _currentInput != Vector2.zero;
 
         if (isMoving)
             HandleActiveMovement(dt);
         else
             HandleStopMovement();
 
-        wasMoving = isMoving;
+        _wasMoving = isMoving;
 
         if (Input.GetKeyDown(KeyCode.E))
             Interact();
@@ -53,13 +53,25 @@ public class PlayerController : MonoBehaviour {
 
     private void Interact()     
     {
-        Vector3 interactPos = transform.position + (Vector3)facingDir;
+        Vector3 interactPos = transform.position + (Vector3)_facingDir;
         //Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
-        var collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactiveLayer);
+        var collider = Physics2D.OverlapCircle(interactPos, 0.2f, _interactiveLayer);
         if (collider != null)
         {
             collider.GetComponent<Interactable>()?.Interact();
         }
+    }
+
+    public void StopMoving()
+    {
+        StopAllCoroutines();
+        _currentInput = Vector2.zero;
+        _lastActiveInput = Vector2.zero;
+        _inputStopTimer = inputStopThreshold;
+        _wasMoving = false;
+        _isDecelerating = true;
+
+        _playerAnimation.SetBool("is_moving", false);
     }
 
     //Input
@@ -72,14 +84,14 @@ public class PlayerController : MonoBehaviour {
         //has input
         if (hasRawInput)
         {
-            inputStopTimer = 0f;
+            _inputStopTimer = 0f;
             return new Vector2(rawX, rawY);
         }
         //transition before stop
-        if (inputStopTimer < inputStopThreshold)
+        if (_inputStopTimer < inputStopThreshold)
         {
-            inputStopTimer += dt;
-            return currentInput;
+            _inputStopTimer += dt;
+            return _currentInput;
         }
         return Vector2.zero;
     }
@@ -87,22 +99,22 @@ public class PlayerController : MonoBehaviour {
     //Handler
     private void HandleActiveMovement(float dt)
     {
-        if (!wasMoving)
-            isDecelerating = false;
+        if (!_wasMoving)
+            _isDecelerating = false;
 
-        lastActiveInput = currentInput;
-        UpdateAnimation(currentInput, true);
-        TryMove(currentInput.x * vx * dt, currentInput.y * vy * dt);
+        _lastActiveInput = _currentInput;
+        UpdateAnimation(_currentInput, true);
+        TryMove(_currentInput.x * vx * dt, _currentInput.y * vy * dt);
     }
 
     private void HandleStopMovement()
     {
-        if (isDecelerating)
+        if (_isDecelerating)
             return;
 
-        isDecelerating = true;
-        float startVx = lastActiveInput.x * vx;
-        float startVy = lastActiveInput.y * vy;
+        _isDecelerating = true;
+        float startVx = _lastActiveInput.x * vx;
+        float startVy = _lastActiveInput.y * vy;
         StartCoroutine(DecelerateCoroutine(startVx, startVy, transitionTimeSec));
     }
 
@@ -113,7 +125,7 @@ public class PlayerController : MonoBehaviour {
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            if (!isDecelerating)
+            if (!_isDecelerating)
                 yield break;
             float dt = Time.deltaTime;
             elapsed += dt;
@@ -167,7 +179,7 @@ public class PlayerController : MonoBehaviour {
 
 	private bool IsWalkable(Vector3 targetPos)
 	{
-		if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectLayer | interactiveLayer))
+		if (Physics2D.OverlapCircle(targetPos, 0.2f, _solidObjectLayer | _interactiveLayer))
 			return false;
 		return true;
 	}
@@ -175,13 +187,13 @@ public class PlayerController : MonoBehaviour {
     // Play animation
     private void UpdateAnimation(Vector2 direction, bool moving)
     {
-        playerAnimation.SetBool("is_moving", moving);
+        _playerAnimation.SetBool("is_moving", moving);
 
         if (moving && direction.sqrMagnitude > 0.01f)
         {
-            facingDir = GetFacingDir(direction);
-            playerAnimation.SetFloat("mx", direction.x);
-            playerAnimation.SetFloat("my", direction.y);
+            _facingDir = GetFacingDir(direction);
+            _playerAnimation.SetFloat("mx", direction.x);
+            _playerAnimation.SetFloat("my", direction.y);
         }
     }
 

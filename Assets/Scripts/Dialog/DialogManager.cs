@@ -11,8 +11,10 @@ public class DialogManager : MonoBehaviour
     private int _currentLine = 0;
     private Dialog _dialog;
     private bool _isTyping;
+
     public event Action OnShowDialog;
     public event Action OnHideDialog;
+
 
     public static DialogManager Instance { get; private set; }
 
