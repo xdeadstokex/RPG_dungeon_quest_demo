@@ -34,6 +34,12 @@ public class PlayerController : MonoBehaviour {
 		_playerAnimation = GetComponent<Animator>();
 	}
 
+
+	private void Update(){
+		HandleUpdate();
+	}
+
+
     public void HandleUpdate()
     {
         float dt = Time.deltaTime;
