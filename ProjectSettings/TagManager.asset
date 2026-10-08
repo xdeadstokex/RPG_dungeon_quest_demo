@@ -13,6 +13,7 @@ TagManager:
   - UI
   - 
   - SolidObjects
+  - 
   - Interactive
   - 
   - 
@@ -34,8 +35,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
+  - TriggerZone
   - 
   m_SortingLayers:
   - name: Default

@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour {
 	[Header("Collision")]
 	[SerializeField] private LayerMask _solidObjectLayer;
     [SerializeField] private LayerMask _interactiveLayer;
+	[SerializeField] private LayerMask _triggerZoneLayer;
 	[SerializeField] private float _collisionCheckRadius;
 
     [Header("Input")]
@@ -55,6 +56,8 @@ public class PlayerController : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.E))
             Interact();
+		CheckZone();
+		return;
     }
 
     private void Interact()     
@@ -210,6 +213,38 @@ public class PlayerController : MonoBehaviour {
         else
             return new Vector2(0, Mathf.Sign(direction.y));
     }
+
+
+
+
+
+	[SerializeField] private GameObject popupIcon; // drag your 2D asset here in Inspector
+
+
+	bool _inZone = false;
+	string oldZoneName = "";
+
+	void CheckZone(){
+		Collider2D hitObject = Physics2D.OverlapCircle(transform.position, 0.5f, _triggerZoneLayer);
+		bool inside = hitObject != null;
+		
+		if (inside && !_inZone){
+			_inZone = true;
+			popupIcon.SetActive(true);
+			Debug.Log("entered");
+			Debug.Log(hitObject.gameObject.name);
+			oldZoneName = hitObject.gameObject.name;
+		}
+		else if (!inside && _inZone){
+			_inZone = false;
+			popupIcon.SetActive(false);
+			Debug.Log("fuck you, get out!");
+			Debug.Log(oldZoneName);
+		}
+	}
+
+
+
 
 
 }
