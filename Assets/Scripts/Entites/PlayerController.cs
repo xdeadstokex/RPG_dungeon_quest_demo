@@ -14,9 +14,6 @@ public class PlayerController : MonoBehaviour {
     public float transitionTimeSec = 1;
 
 	[Header("Collision")]
-	[SerializeField] private LayerMask _solidObjectLayer;
-    [SerializeField] private LayerMask _interactiveLayer;
-	[SerializeField] private LayerMask _triggerZoneLayer;
 	[SerializeField] private float _collisionCheckRadius;
 
     [Header("Input")]
@@ -41,30 +38,30 @@ public class PlayerController : MonoBehaviour {
 //	}
 
 
-    public void HandleUpdate()
+    public void HandleUpdate(LayerMask solidObjectLayer, LayerMask interactiveLayer)
     {
         float dt = Time.deltaTime;
         _currentInput = ReadBufferedInput(dt);
         bool isMoving = _currentInput != Vector2.zero;
 
         if (isMoving)
-            HandleActiveMovement(dt);
+            HandleActiveMovement(dt, solidObjectLayer, interactiveLayer);
         else
-            HandleStopMovement();
+            HandleStopMovement(solidObjectLayer, interactiveLayer);
 
         _wasMoving = isMoving;
 
         if (Input.GetKeyDown(KeyCode.E))
-            Interact();
-		CheckZone();
+            Interact(interactiveLayer);
+		//CheckZone();
 		return;
     }
 
-    private void Interact()     
+    private void Interact(LayerMask interactiveLayer)
     {
         Vector3 interactPos = transform.position + (Vector3)_facingDir;
         //Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
-        var collider = Physics2D.OverlapCircle(interactPos, 0.2f, _interactiveLayer);
+        var collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactiveLayer);
         if (collider != null)
         {
             collider.GetComponent<Interactable>()?.Interact();
@@ -106,17 +103,17 @@ public class PlayerController : MonoBehaviour {
     }
 
     //Handler
-    private void HandleActiveMovement(float dt)
+    private void HandleActiveMovement(float dt, LayerMask solidObjectLayer, LayerMask interactiveLayer)
     {
         if (!_wasMoving)
             _isDecelerating = false;
 
         _lastActiveInput = _currentInput;
         UpdateAnimation(_currentInput, true);
-        TryMove(_currentInput.x * vx * dt, _currentInput.y * vy * dt);
+        TryMove(_currentInput.x * vx * dt, _currentInput.y * vy * dt, solidObjectLayer, interactiveLayer);
     }
 
-    private void HandleStopMovement()
+    private void HandleStopMovement(LayerMask solidObjectLayer, LayerMask interactiveLayer)
     {
         if (_isDecelerating)
             return;
@@ -124,12 +121,12 @@ public class PlayerController : MonoBehaviour {
         _isDecelerating = true;
         float startVx = _lastActiveInput.x * vx;
         float startVy = _lastActiveInput.y * vy;
-        StartCoroutine(DecelerateCoroutine(startVx, startVy, transitionTimeSec));
+        StartCoroutine(DecelerateCoroutine(startVx, startVy, transitionTimeSec, solidObjectLayer, interactiveLayer));
     }
 
 
     //Slow down coroutine
-    private IEnumerator DecelerateCoroutine(float startVx, float startVy, float duration)
+    private IEnumerator DecelerateCoroutine(float startVx, float startVy, float duration, LayerMask solidObjectLayer, LayerMask interactiveLayer)
     {
         float elapsed = 0f;
         while (elapsed < duration)
@@ -141,7 +138,7 @@ public class PlayerController : MonoBehaviour {
 
             float t = 1f - (elapsed / duration);
 
-            bool moved = TryMove(startVx * t * dt, startVy * t * dt);
+            bool moved = TryMove(startVx * t * dt, startVy * t * dt, solidObjectLayer, interactiveLayer);
 
             if (t <= 0.1f || !moved)
             {
@@ -155,8 +152,8 @@ public class PlayerController : MonoBehaviour {
 	}
 
     //Move and Collision
-    //check each exis
-    private bool TryMove(float dx, float dy)
+    //check each axis
+    private bool TryMove(float dx, float dy, LayerMask solidObjectLayer, LayerMask interactiveLayer)
     {
         Vector3 targetPos = transform.position;
         bool moved = false;
@@ -164,7 +161,7 @@ public class PlayerController : MonoBehaviour {
         {
             Vector3 targetX = targetPos;
             targetX.x += dx;
-            if (IsWalkable(targetX))
+            if (IsWalkable(targetX, solidObjectLayer, interactiveLayer))
             {
                 targetPos.x = targetX.x;
                 moved = true;
@@ -174,7 +171,7 @@ public class PlayerController : MonoBehaviour {
         {
             Vector3 targetY = targetPos;
             targetY.y += dy;
-            if (IsWalkable(targetY))
+            if (IsWalkable(targetY, solidObjectLayer, interactiveLayer))
             {
                 targetPos.y = targetY.y;
                 moved = true;
@@ -186,9 +183,9 @@ public class PlayerController : MonoBehaviour {
     }
 
 
-	private bool IsWalkable(Vector3 targetPos)
+	private bool IsWalkable(Vector3 targetPos, LayerMask solidObjectLayer, LayerMask interactiveLayer)
 	{
-		if (Physics2D.OverlapCircle(targetPos, 0.2f, _solidObjectLayer | _interactiveLayer))
+		if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectLayer | interactiveLayer))
 			return false;
 		return true;
 	}
@@ -215,17 +212,13 @@ public class PlayerController : MonoBehaviour {
     }
 
 
-
-
-
-	[SerializeField] private GameObject popupIcon; // drag your 2D asset here in Inspector
-
+	[SerializeField] private GameObject popupIcon;
 
 	bool _inZone = false;
 	string oldZoneName = "";
 
-	void CheckZone(){
-		Collider2D hitObject = Physics2D.OverlapCircle(transform.position, 0.5f, _triggerZoneLayer);
+	public void CheckZone(LayerMask triggerZone){
+		Collider2D hitObject = Physics2D.OverlapCircle(transform.position, 0.5f, triggerZone);
 		bool inside = hitObject != null;
 		
 		if (inside && !_inZone){
@@ -241,10 +234,7 @@ public class PlayerController : MonoBehaviour {
 			Debug.Log("fuck you, get out!");
 			Debug.Log(oldZoneName);
 		}
+
+		return;
 	}
-
-
-
-
-
 }
