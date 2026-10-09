@@ -3857,6 +3857,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd48efd25af41d408021a3501ef5844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameController
+  _solidObjectLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  _interactiveLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  _triggerZoneLayer:
+    serializedVersion: 2
+    m_Bits: 1073741824
   _playerController: {fileID: 1979284990}
 --- !u!4 &1324906947
 Transform:
@@ -13164,15 +13173,6 @@ MonoBehaviour:
   vy: 4
   activeMovingTransition: 0
   transitionTimeSec: 0.15
-  _solidObjectLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  _interactiveLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  _triggerZoneLayer:
-    serializedVersion: 2
-    m_Bits: 1073741824
   _collisionCheckRadius: 0
   inputStopThreshold: 0.05
   popupIcon: {fileID: 1725568230}
@@ -13372,12 +13372,12 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1324906947}
   - {fileID: 619394802}
   - {fileID: 1339061202}
   - {fileID: 1979284992}
   - {fileID: 192412233}
   - {fileID: 77610859}
-  - {fileID: 1324906947}
   - {fileID: 893384105}
   - {fileID: 299659113}
   - {fileID: 814076860}
