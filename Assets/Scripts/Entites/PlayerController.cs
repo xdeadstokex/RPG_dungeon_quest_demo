@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour {
+
+//================  DATA FIELD  =================
 	[Header("Movement speed")]
     public float vx = 10;
     public float vy = 10;
@@ -33,6 +35,15 @@ public class PlayerController : MonoBehaviour {
     private Animator _playerAnimation;
 
 
+//==============  HELPER FIELD  =================
+
+	// may remapped later (custom player keymapping system)
+	private bool MoveLeft(){	return (KBInputUtils.KeyA() || KBInputUtils.KeyArrowLeft()); }
+	private bool MoveRight(){	return (KBInputUtils.KeyD() || KBInputUtils.KeyArrowRight()); }
+	private bool MoveUp(){		return (KBInputUtils.KeyW() || KBInputUtils.KeyArrowUp()); }
+	private bool MoveDown(){	return (KBInputUtils.KeyS() || KBInputUtils.KeyArrowDown()); }
+
+//================  MAIN FIELD  =================
     private void Awake(){
 		_playerAnimation = GetComponent<Animator>();
 	}
@@ -56,9 +67,9 @@ public class PlayerController : MonoBehaviour {
 
         _wasMoving = isMoving;
 
-        if (Input.GetKeyDown(KeyCode.E))
-            Interact(interactiveLayer);
-		//CheckZone();
+        if(KBInputUtils.KeyE()){ Interact(interactiveLayer); }
+		Debug.Log(MouseInputUtils.MouseX() + " " + MouseInputUtils.MouseY());
+
 		return;
     }
 
@@ -86,10 +97,11 @@ public class PlayerController : MonoBehaviour {
     }
 
     //Input
-    private Vector2 ReadBufferedInput(float dt)
-    {
-        float rawX = Input.GetAxis("Horizontal");
-        float rawY = Input.GetAxis("Vertical");
+    private Vector2 ReadBufferedInput(float dt){
+        //float rawX = Input.GetAxis("Horizontal");
+        //float rawY = Input.GetAxis("Vertical");
+		float rawX = MoveRight() ? 1f : (MoveLeft() ? -1f : 0f);
+		float rawY = MoveUp()    ? 1f : (MoveDown() ? -1f : 0f);
         bool hasRawInput = rawX != 0f || rawY != 0f;
 
         //has input
@@ -246,9 +258,15 @@ public class PlayerController : MonoBehaviour {
 	public void ChangeScene(LayerMask triggerZone){
 		Collider2D hitObject = Physics2D.OverlapCircle(transform.position, 0.5f, triggerZone);
 		bool inside = hitObject != null;
-		
+		string currentSceneName = SceneManager.GetActiveScene().name;
 		if(inside && hitObject.gameObject.name == "SceneChangingTestZone"){
-			SceneManager.LoadScene("Test");
+			if(currentSceneName == "main_test_scene 1"){
+				SceneManager.LoadScene("Test");
+			}
+			
+			if(currentSceneName == "Test"){
+				SceneManager.LoadScene("main_test_scene 1");
+			}
 		}
 		
 		return;
