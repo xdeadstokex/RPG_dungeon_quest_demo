@@ -3,6 +3,11 @@ using System.Xml;
 using Unity.VisualScripting;
 using UnityEngine;
 
+
+using UnityEngine.SceneManagement;
+
+
+
 [RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour {
 	[Header("Movement speed")]
@@ -235,6 +240,17 @@ public class PlayerController : MonoBehaviour {
 			Debug.Log(oldZoneName);
 		}
 
+		return;
+	}
+
+	public void ChangeScene(LayerMask triggerZone){
+		Collider2D hitObject = Physics2D.OverlapCircle(transform.position, 0.5f, triggerZone);
+		bool inside = hitObject != null;
+		
+		if(inside && hitObject.gameObject.name == "SceneChangingTestZone"){
+			SceneManager.LoadScene("Test");
+		}
+		
 		return;
 	}
 }

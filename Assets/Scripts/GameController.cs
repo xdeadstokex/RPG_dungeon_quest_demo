@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour
         if(_state == GameState.FreeRoam){
 			_playerController.CheckZone(_triggerZoneLayer);
 			_playerController.HandleUpdate(_solidObjectLayer, _interactiveLayer);
+			_playerController.ChangeScene(_triggerZoneLayer);
 		}
         else if (_state == GameState.Dialog){ DialogManager.Instance.HandleUpdate(); }
         else if (_state == GameState.Battle){ ;}
