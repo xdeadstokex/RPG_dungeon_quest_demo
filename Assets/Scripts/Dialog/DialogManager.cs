@@ -23,17 +23,15 @@ public class DialogManager : MonoBehaviour
         Instance = this;
     }
 
-    public IEnumerator ShowDialog(Dialog dialog)
+    public void HandleUpdate()
     {
-        yield return new WaitForEndOfFrame();
-        OnShowDialog?.Invoke();
+        HandleSkipDialog();
+        HandleNextLine();
 
-        this._dialog = dialog;
-        _dialogBox.SetActive(true);
-        StartCoroutine(TypeDialog(dialog.Lines[0]));
     }
 
-    public void HandleUpdate()
+
+    private void HandleNextLine()
     {
         if (IsKeyEPressed() && !_isTyping)
         {
@@ -51,6 +49,27 @@ public class DialogManager : MonoBehaviour
         }
     }
 
+    private void HandleSkipDialog()
+    {
+        if (IsKeyXPressed() && _dialogBox.activeSelf)
+        {
+            _currentLine = 0;
+            _dialogBox.SetActive(false);
+            OnHideDialog?.Invoke();
+            return;
+        }
+    }
+
+    public IEnumerator ShowDialog(Dialog dialog)
+    {
+        yield return new WaitForEndOfFrame();
+        OnShowDialog?.Invoke();
+
+        this._dialog = dialog;
+        _dialogBox.SetActive(true);
+        StartCoroutine(TypeDialog(dialog.Lines[0]));
+    }
+
     public IEnumerator TypeDialog(string line)
     {
         _isTyping = true;
@@ -64,4 +83,5 @@ public class DialogManager : MonoBehaviour
     }
 
     private bool IsKeyEPressed() { return KBInputUtils.KeyEClick(); }
+    private bool IsKeyXPressed() { return KBInputUtils.KeyXClick();}
 }

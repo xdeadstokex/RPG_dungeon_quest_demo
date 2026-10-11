@@ -29,6 +29,10 @@ public static bool KeyEClick()
     return Keyboard.current.eKey.wasPressedThisFrame;
 }
 
+public static bool KeyXClick()
+{
+    return Keyboard.current.xKey.wasPressedThisFrame;
+}
 
 public static bool KeyArrowUp(){
     return Keyboard.current.upArrowKey.isPressed;

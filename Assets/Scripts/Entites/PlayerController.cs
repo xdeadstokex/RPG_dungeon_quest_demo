@@ -48,13 +48,17 @@ public class PlayerController : MonoBehaviour {
 		_playerAnimation = GetComponent<Animator>();
 	}
 
-
-//	private void Update(){
-//		HandleUpdate();
-//	}
-
-
     public void HandleUpdate(LayerMask solidObjectLayer, LayerMask interactiveLayer)
+    {
+        HandleMovement(solidObjectLayer, interactiveLayer);
+        HandleDialog(interactiveLayer);
+		Debug.Log(MouseInputUtils.MouseX() + " " + MouseInputUtils.MouseY());
+
+		return;
+    }
+
+
+    private void HandleMovement(LayerMask solidObjectLayer, LayerMask interactiveLayer)
     {
         float dt = Time.deltaTime;
         _currentInput = ReadBufferedInput(dt);
@@ -66,11 +70,14 @@ public class PlayerController : MonoBehaviour {
             HandleStopMovement(solidObjectLayer, interactiveLayer);
 
         _wasMoving = isMoving;
+    }
 
-        if(KBInputUtils.KeyEClick()){ Interact(interactiveLayer); }
-		Debug.Log(MouseInputUtils.MouseX() + " " + MouseInputUtils.MouseY());
-
-		return;
+    private void HandleDialog(LayerMask interactiveLayer)
+    {
+        if (KBInputUtils.KeyEClick())
+            Interact(interactiveLayer);
+        //if (KBInputUtils.KeyXClick())
+        //    SkipDialog()
     }
 
     private void Interact(LayerMask interactiveLayer)
