@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour {
 
         _wasMoving = isMoving;
 
-        if(KBInputUtils.KeyE()){ Interact(interactiveLayer); }
+        if(KBInputUtils.KeyEClick()){ Interact(interactiveLayer); }
 		Debug.Log(MouseInputUtils.MouseX() + " " + MouseInputUtils.MouseY());
 
 		return;

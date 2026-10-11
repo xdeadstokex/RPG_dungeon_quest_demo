@@ -24,6 +24,10 @@ public static bool KeyAUnclick(){
 }
 
 
+public static bool KeyEClick()
+{
+    return Keyboard.current.eKey.wasPressedThisFrame;
+}
 
 
 public static bool KeyArrowUp(){

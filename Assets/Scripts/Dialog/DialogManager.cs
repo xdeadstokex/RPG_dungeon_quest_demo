@@ -63,5 +63,5 @@ public class DialogManager : MonoBehaviour
         _isTyping = false;
     }
 
-    private bool IsKeyEPressed() { return KBInputUtils.KeyE(); }
+    private bool IsKeyEPressed() { return KBInputUtils.KeyEClick(); }
 }
