@@ -35,7 +35,7 @@ public class DialogManager : MonoBehaviour
 
     public void HandleUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.E) && !_isTyping)
+        if (IsKeyEPressed() && !_isTyping)
         {
             ++_currentLine;
             if (_currentLine < _dialog.Lines.Count)
@@ -62,4 +62,6 @@ public class DialogManager : MonoBehaviour
         }
         _isTyping = false;
     }
+
+    private bool IsKeyEPressed() { return KBInputUtils.KeyE(); }
 }
