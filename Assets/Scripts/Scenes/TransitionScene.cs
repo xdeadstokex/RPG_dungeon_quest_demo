@@ -21,6 +21,6 @@ public class TransitionScene : MonoBehaviour
             elapsed += Time.deltaTime;
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
-        op.allowSceneActivation = false;
+        op.allowSceneActivation = true;
     }
 }

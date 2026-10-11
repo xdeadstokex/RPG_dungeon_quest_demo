@@ -34,10 +34,15 @@ public static bool KeyXClick()
     return Keyboard.current.xKey.wasPressedThisFrame;
 }
 
+public static bool KeyEscapeClick()
+{
+    return Keyboard.current.escapeKey.wasPressedThisFrame;
+}
+
+
 public static bool KeyArrowUp(){
     return Keyboard.current.upArrowKey.isPressed;
 }
-
 
 public static bool KeyArrowDown(){
     return Keyboard.current.downArrowKey.isPressed;
