@@ -267,12 +267,12 @@ public class PlayerController : MonoBehaviour {
 		bool inside = hitObject != null;
 		string currentSceneName = SceneManager.GetActiveScene().name;
 		if(inside && hitObject.gameObject.name == "SceneChangingTestZone"){
-			if(currentSceneName == "main_test_scene 1"){
+			if(currentSceneName == "MainScene"){
 				SceneManager.LoadScene("Test");
 			}
 			
 			if(currentSceneName == "Test"){
-				SceneManager.LoadScene("main_test_scene 1");
+				SceneManager.LoadScene("MainScene");
 			}
 		}
 		
