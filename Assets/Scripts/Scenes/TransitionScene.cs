@@ -16,6 +16,7 @@ public class TransitionScene : MonoBehaviour
         var token = this.GetCancellationTokenOnDestroy();
         var op = SceneManager.LoadSceneAsync(nextSceneName);
         op.allowSceneActivation = false;
+
         while (op.progress < 0.9f || elapsed < minLoadingDuration)
         {
             elapsed += Time.deltaTime;

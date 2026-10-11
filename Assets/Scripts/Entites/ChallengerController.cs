@@ -11,6 +11,6 @@ public class ChallengerController : MonoBehaviour, Interactable
 
         Debug.Log("You will start a battle");
         TransitionScene.nextSceneName = "FightScene";
-        SceneManager.LoadSceneAsync("TransitionScene");
+        SceneManager.LoadScene("TransitionScene");
     }
 }
