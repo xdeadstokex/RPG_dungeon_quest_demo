@@ -17,14 +17,13 @@ namespace Assets.Scripts
         [SerializeField] private DialogManager _dialog;
         [SerializeField] private PopupIconView _popup;
 
-        private static ISceneLoader _sceneLoader; //make it survive through scenes (i will learn injection container after)
 
         private void Awake()
         {
             IInputService input = new KeyboardInputService();
             IGameStateService state = new GameStateService();
             ICollisionQuery collision = new PhysicsCollisionQuery(_solidLayer, _interactiveLayer);
-            _sceneLoader ??= new SceneLoader();
+            ISceneLoader sceneLoader = SceneLoader.Shared;
 
             _player.Construct(input, collision);
             _dialog.Construct(input);
@@ -34,9 +33,9 @@ namespace Assets.Scripts
             foreach (var npc in FindObjectsByType<NPCController>(FindObjectsSortMode.None))
                 npc.Construct(_dialog);
             foreach (var c in FindObjectsByType<ChallengerController>(FindObjectsSortMode.None))
-                c.Construct(_sceneLoader);
+                c.Construct(sceneLoader);
             foreach (var z in FindObjectsByType<SceneChangeZone>(FindObjectsSortMode.None))
-                z.Construct(_sceneLoader);
+                z.Construct(sceneLoader);
 
             _dialog.OnOpened += () => { state.Set(GameState.Dialog); _player.Freeze(); };
             _dialog.OnClosed += () => state.Set(GameState.FreeRoam);

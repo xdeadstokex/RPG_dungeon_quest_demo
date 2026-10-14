@@ -15,16 +15,22 @@ public class TransitionScene : MonoBehaviour
         string target = string.IsNullOrEmpty(nextSceneName) ? fallbackScene : nextSceneName;
         nextSceneName = null;
         //can add data loading and loading animation after
-        float elapsed = 0f;
         var token = this.GetCancellationTokenOnDestroy();
         var op = SceneManager.LoadSceneAsync(target);
         op.allowSceneActivation = false;
 
-        while (op.progress < 0.9f || elapsed < minLoadingDuration)
+        try
         {
-            elapsed += Time.deltaTime;
-            await UniTask.Yield(PlayerLoopTiming.Update, token);
+            float elapsed = 0f;
+            while (op.progress < 0.9f || elapsed < minLoadingDuration)
+            {
+                elapsed += Time.deltaTime;
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
+            }
         }
-        op.allowSceneActivation = true;
+        finally
+        {
+            op.allowSceneActivation = true;
+        }
     }
 }
