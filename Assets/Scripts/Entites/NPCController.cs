@@ -2,7 +2,7 @@ using Assets.Scripts.Core;
 using System;
 using UnityEngine;
 
-public class NPCController : MonoBehaviour, Interactable
+public class NPCController : MonoBehaviour, IInteractable
 {
     [SerializeField] private Dialog _dialog;
     private IDialogService _dialogService;

@@ -2,7 +2,7 @@ using Assets.Scripts.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ChallengerController : MonoBehaviour, Interactable
+public class ChallengerController : MonoBehaviour, IInteractable
 {
     [SerializeField] private string _battleScene = "FightScene";
     private ISceneLoader _loader;
