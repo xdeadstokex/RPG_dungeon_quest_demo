@@ -1,76 +1,71 @@
+using Assets.Scripts.Core;
 using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DialogManager : MonoBehaviour
+public class DialogManager : MonoBehaviour, IDialogService, ITickable
 {
     [SerializeField] private GameObject _dialogBox;
     [SerializeField] private Text _dialogText;
     [SerializeField] private int _letterPerSecond;
-    private int _currentLine = 0;
+
+    private IInputService _input;
     private Dialog _dialog;
+    private int _currentLine = 0;
     private bool _isTyping;
 
-    public event Action OnShowDialog;
-    public event Action OnHideDialog;
+    public event Action OnOpened;
+    public event Action OnClosed;
 
 
-    public static DialogManager Instance { get; private set; }
-
-    private void Awake()
+    public void Construct(IInputService input)
     {
-        Instance = this;
+        _input = input;
     }
 
-    public void HandleUpdate()
+    public void Show(Dialog dialog)
     {
-        HandleSkipDialog();
-        HandleNextLine();
-
+        StartCoroutine(ShowRoutine(dialog));
     }
 
-
-    private void HandleNextLine()
-    {
-        if (IsKeyEPressed() && !_isTyping)
-        {
-            ++_currentLine;
-            if (_currentLine < _dialog.Lines.Count)
-            {
-                StartCoroutine(TypeDialog(_dialog.Lines[_currentLine]));
-            }
-            else
-            {
-                _currentLine = 0;
-                _dialogBox.SetActive(false);
-                OnHideDialog?.Invoke();
-            }
-        }
-    }
-
-    private void HandleSkipDialog()
-    {
-        if (IsKeyXPressed() && _dialogBox.activeSelf)
-        {
-            _currentLine = 0;
-            _dialogBox.SetActive(false);
-            OnHideDialog?.Invoke();
-            return;
-        }
-    }
-
-    public IEnumerator ShowDialog(Dialog dialog)
+    public IEnumerator ShowRoutine(Dialog dialog)
     {
         yield return new WaitForEndOfFrame();
-        OnShowDialog?.Invoke();
-
-        this._dialog = dialog;
+        _dialog = dialog;
+        _currentLine = 0;
         _dialogBox.SetActive(true);
+        OnOpened?.Invoke();
         StartCoroutine(TypeDialog(dialog.Lines[0]));
     }
 
-    public IEnumerator TypeDialog(string line)
+    public void Tick()
+    {
+        if (_input.CancelPressed)
+        {
+            Close();
+            return;
+        }
+        if (_input.InteractPressed && !_isTyping)
+            Next();
+    }
+
+    private void Next()
+    {
+        if (++_currentLine < _dialog.Lines.Count)
+            StartCoroutine(TypeDialog(_dialog.Lines[_currentLine]));
+        else
+            Close();
+    }
+
+    private void Close()
+    {
+        _currentLine = 0;
+        _dialogBox.SetActive(false);
+        OnClosed?.Invoke();
+    }
+
+    private IEnumerator TypeDialog(string line)
     {
         _isTyping = true;
         _dialogText.text = "";
@@ -82,6 +77,62 @@ public class DialogManager : MonoBehaviour
         _isTyping = false;
     }
 
-    private bool IsKeyEPressed() { return KBInputUtils.KeyEClick(); }
-    private bool IsKeyXPressed() { return KBInputUtils.KeyXClick();}
+    //public static DialogManager Instance { get; private set; }
+
+    //private void Awake()
+    //{
+    //    Instance = this;
+    //}
+
+    //public void HandleUpdate()
+    //{
+    //    HandleSkipDialog();
+    //    HandleNextLine();
+
+    //}
+
+
+    //private void HandleNextLine()
+    //{
+    //    if (IsKeyEPressed() && !_isTyping)
+    //    {
+    //        ++_currentLine;
+    //        if (_currentLine < _dialog.Lines.Count)
+    //        {
+    //            StartCoroutine(TypeDialog(_dialog.Lines[_currentLine]));
+    //        }
+    //        else
+    //        {
+    //            _currentLine = 0;
+    //            _dialogBox.SetActive(false);
+    //            OnHideDialog?.Invoke();
+    //        }
+    //    }
+    //}
+
+    //private void HandleSkipDialog()
+    //{
+    //    if (IsKeyXPressed() && _dialogBox.activeSelf)
+    //    {
+    //        _currentLine = 0;
+    //        _dialogBox.SetActive(false);
+    //        OnHideDialog?.Invoke();
+    //        return;
+    //    }
+    //}
+
+    //public IEnumerator ShowDialog(Dialog dialog)
+    //{
+    //    yield return new WaitForEndOfFrame();
+    //    OnShowDialog?.Invoke();
+
+    //    this._dialog = dialog;
+    //    _dialogBox.SetActive(true);
+    //    StartCoroutine(TypeDialog(dialog.Lines[0]));
+    //}
+
+
+
+    //private bool IsKeyEPressed() { return KBInputUtils.KeyEClick(); }
+    //private bool IsKeyXPressed() { return KBInputUtils.KeyXClick();}
 }

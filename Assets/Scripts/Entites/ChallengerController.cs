@@ -1,16 +1,25 @@
+using Assets.Scripts.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class ChallengerController : MonoBehaviour, Interactable
 {
+    [SerializeField] private string _battleScene = "FightScene";
+    private ISceneLoader _loader;
     private bool _isLoading;
+
+
+    public void Construct(ISceneLoader loader)
+    {
+        _loader = loader;
+    }
+
     public void Interact()
     {
-        if (_isLoading) return;
+        if (_isLoading) 
+            return;
         _isLoading = true;
 
-        Debug.Log("You will start a battle");
-        TransitionScene.nextSceneName = "FightScene";
-        SceneManager.LoadScene("TransitionScene");
+        _loader.LoadWithTransition(_battleScene);
     }
 }
