@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour, ITickable
 
     public void Tick()
     {
+        _mover.Configure(_speed, _accel, _decel);
         _mover.Tick(_input.Move, Time.deltaTime);
         Zones.Tick();
         if (_input.InteractPressed)

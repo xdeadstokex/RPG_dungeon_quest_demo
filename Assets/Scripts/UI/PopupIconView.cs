@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Core;
 using Assets.Scripts.Player;
+using Assets.Scripts.Scenes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,8 +15,8 @@ namespace Assets.Scripts.UI
 
         public void Bind(ZoneDetector zones)
         {
-            zones.OnEntered += _ => _icon.SetActive(true);
-            zones.OnExited += _ => _icon.SetActive(false);
+            zones.OnEntered += z => { if (z is PopupZone) _icon.SetActive(true); };
+            zones.OnExited += z => { if (z is PopupZone) _icon.SetActive(false); };
         }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using Assets.Scripts.Core;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace Assets.Scripts.Player
@@ -10,8 +8,8 @@ namespace Assets.Scripts.Player
     {
         private readonly Transform _transform;
         private readonly ICollisionQuery _collision;
-        private readonly Vector2 _speed;
-        private readonly float _accel, _decel;
+        private Vector2 _speed;
+        private float _accel, _decel;
         private Vector2 _velocity;
         private Vector2 _lastInput;
         private bool _wasMoving;
@@ -23,6 +21,13 @@ namespace Assets.Scripts.Player
         {
             _collision = collision;
             _transform = transform;
+            _speed = speed;
+            _accel = accel;
+            _decel = decel;
+        }
+
+        public void Configure(Vector2 speed, float accel, float decel)
+        {
             _speed = speed;
             _accel = accel;
             _decel = decel;

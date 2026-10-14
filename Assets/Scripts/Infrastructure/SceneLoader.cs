@@ -18,6 +18,7 @@ namespace Assets.Scripts.Infrastructure
         public void LoadWithTransition(string sceneName)
         {
             PendingScene = sceneName;
+            TransitionScene.nextSceneName = sceneName;
             SceneManager.LoadScene("TransitionScene");
         }
     }
