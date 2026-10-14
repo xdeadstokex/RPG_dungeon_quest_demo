@@ -10,6 +10,7 @@ namespace Assets.Scripts.Scenes
     {
         [SerializeField] private string _targetScene;
         private ISceneLoader _loader;
+        private bool _isLoading;
 
 
         public void Construct(ISceneLoader loader)
@@ -19,6 +20,9 @@ namespace Assets.Scripts.Scenes
 
         public void OnEnter()
         {
+            if (_isLoading)
+                return;
+            _isLoading = true;
             _loader.Load(_targetScene);
         }
 

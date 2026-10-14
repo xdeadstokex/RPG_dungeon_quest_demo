@@ -14,6 +14,7 @@ public class DialogManager : MonoBehaviour, IDialogService, ITickable
     private Dialog _dialog;
     private int _currentLine = 0;
     private bool _isTyping;
+    private bool _isOpening;
 
     public event Action OnOpened;
     public event Action OnClosed;
@@ -26,15 +27,21 @@ public class DialogManager : MonoBehaviour, IDialogService, ITickable
 
     public void Show(Dialog dialog)
     {
+        if (_isOpening || _dialogBox.activeSelf)
+            return;
+        if (dialog == null || dialog.Lines == null || dialog.Lines.Count == 0)
+            return;
         StartCoroutine(ShowRoutine(dialog));
     }
 
     public IEnumerator ShowRoutine(Dialog dialog)
     {
+        _isOpening = true;
         yield return new WaitForEndOfFrame();
         _dialog = dialog;
         _currentLine = 0;
         _dialogBox.SetActive(true);
+        _isOpening = false;
         OnOpened?.Invoke();
         StartCoroutine(TypeDialog(dialog.Lines[0]));
     }
@@ -60,6 +67,9 @@ public class DialogManager : MonoBehaviour, IDialogService, ITickable
 
     private void Close()
     {
+        StopAllCoroutines();
+        _isTyping = false;
+        _isOpening = false;
         _currentLine = 0;
         _dialogBox.SetActive(false);
         OnClosed?.Invoke();

@@ -2002,7 +2002,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogManager
   _dialogBox: {fileID: 1009616509}
   _dialogText: {fileID: 2113416035}
-  _letterPerSecond: 10
+  _letterPerSecond: 50
 --- !u!4 &415839695
 Transform:
   m_ObjectHideFlags: 0
@@ -11655,12 +11655,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f823121bf705dcf43ad816ed3dd5059f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _speed: {x: 10, y: 10}
-  _accel: 10
-  _decel: 20
+  _speed: {x: 100, y: 100}
+  _accel: 5
+  _decel: 5
   _zoneLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1073741824
 --- !u!1 &2113416033
 GameObject:
   m_ObjectHideFlags: 0

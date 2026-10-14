@@ -82,7 +82,7 @@ namespace Assets.Scripts.Player
                 moved = true;
             }
 
-            if (distance.y != 0 && !_collision.IsWalkable(moveY))
+            if (distance.y != 0 && _collision.IsWalkable(moveY))
             {
                 pos.y += distance.y;
                 moved = true;

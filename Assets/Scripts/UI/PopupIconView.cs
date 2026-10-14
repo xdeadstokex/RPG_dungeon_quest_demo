@@ -14,7 +14,7 @@ namespace Assets.Scripts.UI
 
         public void Bind(ZoneDetector zones)
         {
-            zones.OnExited += _ => _icon.SetActive(true);
+            zones.OnEntered += _ => _icon.SetActive(true);
             zones.OnExited += _ => _icon.SetActive(false);
         }
     }

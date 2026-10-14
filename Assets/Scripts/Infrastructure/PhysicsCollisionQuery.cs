@@ -1,8 +1,5 @@
 ﻿using Assets.Scripts.Core;
-using System;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace Assets.Scripts.Infrastructure
 {
