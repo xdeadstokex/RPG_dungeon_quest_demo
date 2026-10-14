@@ -18,5 +18,6 @@ public class FightScene : MonoBehaviour
     {
         if (_input.BackPressed)
             _loader.LoadWithTransition(_returnScene);
+            
     }
 }

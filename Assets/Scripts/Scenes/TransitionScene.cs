@@ -12,6 +12,7 @@ public class TransitionScene : MonoBehaviour
 
     private async UniTaskVoid Start()
     {
+        //Debug.Log($"[Transition] id={GetInstanceID()} next='{nextSceneName}' frame={Time.frameCount}");
         string target = string.IsNullOrEmpty(nextSceneName) ? fallbackScene : nextSceneName;
         nextSceneName = null;
         //can add data loading and loading animation after

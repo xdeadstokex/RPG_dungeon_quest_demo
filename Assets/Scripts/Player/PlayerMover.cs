@@ -78,20 +78,22 @@ namespace Assets.Scripts.Player
         {
             Vector2 pos = _transform.position;
             bool moved = false;
+
             Vector2 moveX = pos + new Vector2(distance.x, 0);
             Vector2 moveY = pos + new Vector2(0, distance.y);
 
-            if (distance.x != 0 && _collision.IsWalkable(moveX))
+            if (distance.x != 0)
             {
-                pos.x += distance.x;
-                moved = true;
+                var next = new Vector2(pos.x + distance.x, pos.y);
+                if (_collision.IsWalkable(next)) { pos = next; moved = true; }
             }
 
-            if (distance.y != 0 && _collision.IsWalkable(moveY))
+            if (distance.y != 0)
             {
-                pos.y += distance.y;
-                moved = true;
+                var next = new Vector2(pos.x, pos.y + distance.y);  
+                if (_collision.IsWalkable(next)) { pos = next; moved = true; }
             }
+
             _transform.position = pos;
             return moved;
         }

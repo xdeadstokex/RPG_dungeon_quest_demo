@@ -23,7 +23,7 @@ namespace Assets.Scripts.Scenes
             if (_isLoading)
                 return;
             _isLoading = true;
-            _loader.Load(_targetScene);
+            _loader.LoadWithTransition(_targetScene);
         }
 
         public void OnExit()
