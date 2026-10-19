@@ -4,6 +4,13 @@ using UnityEngine.InputSystem;
 
 public static class MouseInputUtils{
 
+	private static Camera _cam;
+
+	public static Vector2 MouseWorldPos2D(){
+		if(_cam == null) _cam = Camera.main;
+		return _cam.ScreenToWorldPoint(new Vector2(MouseX(), MouseY()));
+	}
+
 	// screen x,y from top left
 	public static float MouseX(){ return Mouse.current.position.ReadValue().x; }
 	public static float MouseY(){ return Mouse.current.position.ReadValue().y; }
