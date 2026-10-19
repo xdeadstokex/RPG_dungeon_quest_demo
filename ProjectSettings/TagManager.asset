@@ -12,9 +12,6 @@ TagManager:
   - Water
   - UI
   - 
-  - SolidObjects
-  - 
-  - Interactive
   - 
   - 
   - 
@@ -35,8 +32,11 @@ TagManager:
   - 
   - 
   - 
-  - TriggerZone
   - 
+  - 
+  - 
+  - Trigger
+  - Solid
   m_SortingLayers:
   - name: Default
     uniqueID: 0

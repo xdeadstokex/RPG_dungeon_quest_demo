@@ -15,9 +15,10 @@ public static bool KeyF(){ return Keyboard.current.fKey.isPressed; }
 
 
 
-public static bool KeyAClick(){
-    return Keyboard.current.aKey.wasPressedThisFrame;
-}
+public static bool KeyAClick(){ return Keyboard.current.aKey.wasPressedThisFrame; }
+public static bool KeyXClick(){ return Keyboard.current.xKey.wasPressedThisFrame; }
+
+public static bool KeyEscapeClick(){ return Keyboard.current.escapeKey.wasPressedThisFrame; }
 
 public static bool KeyAUnclick(){
     return Keyboard.current.aKey.wasReleasedThisFrame;
@@ -29,15 +30,9 @@ public static bool KeyEClick()
     return Keyboard.current.eKey.wasPressedThisFrame;
 }
 
-public static bool KeyXClick()
-{
-    return Keyboard.current.xKey.wasPressedThisFrame;
-}
 
-public static bool KeyEscapeClick()
-{
-    return Keyboard.current.escapeKey.wasPressedThisFrame;
-}
+
+
 
 
 public static bool KeyArrowUp(){
