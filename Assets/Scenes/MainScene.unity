@@ -1880,7 +1880,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -2226,7 +2226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 396f4909f5000b727b47722f517ed6fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneController
-  _minTransitionTime: 0
+  _minTransitionTime: 1
   _currentTransitionTime: 0
   _isSwitchingScene: 0
   _isTransiting: 0
@@ -2279,7 +2279,8 @@ MonoBehaviour:
   zoneLayer:
     serializedVersion: 2
     m_Bits: 1073741824
-  controlledParty: []
+  controlledParty:
+  - {fileID: 1979284989}
 --- !u!4 &1176380859
 Transform:
   m_ObjectHideFlags: 0
@@ -3473,7 +3474,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d20b6a1c1763cdf5a29d69b507151c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChangeSceneObjs
-  _targetScene: 3
+  _targetScene: 0
   _zoneType: 0
   _triggerType: 1
 --- !u!114 &1613701946
