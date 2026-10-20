@@ -8,7 +8,7 @@ public class InputController : MonoBehaviour{
 	private static InputController _instance = null;
 	[SerializeField] public LayerMask zoneLayer;
 	[SerializeField] List<GameObject> controlledParty = new List<GameObject>();
-
+	public Camera mainCam = null;
 
 
 	void Awake(){
@@ -19,18 +19,52 @@ public class InputController : MonoBehaviour{
 		_instance = this;
 		DontDestroyOnLoad(gameObject);
 
-		return;
+		if(_instance.mainCam == null){
+			_instance.mainCam = Camera.main;
+			if(controlledParty.Count == 1){
+				SetCamParent(controlledParty[0], mainCam);
+			}
+		}
+
 	}
+
+
+	// this group is for setting when a scene is loaded
+	void OnEnable(){ UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded; }
+	void OnDisable(){ UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded; }
+	void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode){
+    if(_instance != this) return;
+
+
+	for(int i = 0; i < _instance.controlledParty.Count; i++){
+		SceneUtils.BringObjToScene(_instance.controlledParty[i]);
+	}
+
+
+		Debug.Log("cam after load: " + mainCam);
+		if(mainCam == null){
+			mainCam = Camera.main;
+			if(controlledParty.Count == 1){
+				SetCamParent(controlledParty[0], mainCam);
+			}
+		}
+	}
+
 
     private void Update(){
 		FightSceneProgress();
 		if(controlledParty.Count == 0){
 
 			if (MouseInputUtils.MouseLeftClick()){
-				GameObject hitEntity = ChangeSceneObjs.GetMouseTarget(zoneLayer);
+				GameObject hitEntity = CollisionHandler.GetMouseTarget(zoneLayer);
 				if(hitEntity != null){
 					EntityHandler player = hitEntity.GetComponent<EntityHandler>();
-					if(player != null){ controlledParty.Add(hitEntity); }
+					if(player != null){
+						controlledParty.Add(hitEntity); 
+						if(controlledParty.Count == 1){
+							SetCamParent(controlledParty[0], mainCam);
+						}
+					}
 				}
 			}
 
@@ -48,6 +82,12 @@ public class InputController : MonoBehaviour{
 
 
 
+	private void SetCamParent(GameObject target, Camera cam){
+		cam.transform.SetParent(target.transform);
+		//mainCam.transform.localPosition = Vector3.zero; // or your offset
+		cam.transform.localPosition = new Vector3(0f, 0f, cam.transform.localPosition.z);
+	}
+	
 
 
 	private void FightSceneProgress(){
@@ -57,5 +97,34 @@ public class InputController : MonoBehaviour{
 		}
 		return;
 	}
+	
+
+	public static void OnBeforeSceneChange(){
+		if(_instance == null) return;
+		Debug.Log("ffff");
+
+
+    if(_instance.mainCam != null){
+		_instance.mainCam.transform.SetParent(null); // to not let inherit dontdestroyonload
+		_instance.mainCam = null; // to let go for available next slot
+    }
+
+
+		for(int i = 0; i < _instance.controlledParty.Count; i++){
+			DontDestroyOnLoad(_instance.controlledParty[i]);
+			//_instance.controlledParty[i].SetActive(false); // dont show in transition
+		}
+		
+
+		//Destroy(_instance.mainCam.gameObject); // kill the whole object
+	}
+
+
+
+
+
+
+
+
 
 }
