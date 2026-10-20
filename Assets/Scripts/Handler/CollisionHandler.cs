@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using static GameData;
 
-public class ChangeSceneObjs : MonoBehaviour{
+public class CollisionHandler : MonoBehaviour{
 	//[SerializeField] public string _targetScene = "FightScene";
 
 	// have custom detection radius (maybe change to not layer type)
@@ -11,13 +11,7 @@ public class ChangeSceneObjs : MonoBehaviour{
 		Enter
 	}
 
-	public enum ZoneType{
-		Portal,
-		Teleport,
-		Solid,
-		Dialog,
-		Fight
-	}
+
 
 	[SerializeField] public SceneNames _targetScene = SceneNames.None;
 	[SerializeField] public ZoneType _zoneType = ZoneType.Portal;
@@ -30,14 +24,22 @@ public class ChangeSceneObjs : MonoBehaviour{
 			Collider2D hit = Physics2D.OverlapPoint(MouseInputUtils.MouseWorldPos2D(), layer);
 			if(hit == null){ return null; }
 			Debug.Log("ol");
-			//if(hit.GetComponent<ChangeSceneObjs>() == null){ return null; } // not interactable
+			//if(hit.GetComponent<CollisionHandler>() == null){ return null; } // not interactable
 			return hit.gameObject;
 		}
 
-		public static bool IsInZone(Vector2 playerPos, LayerMask layer){
-			Collider2D hitObject = Physics2D.OverlapCircle(playerPos, 0.5f, layer);
-			return (hitObject != null);
-		}
+
+	public static bool IsInZoneType(Vector2 playerPos, PlayerData data, LayerMask layer, ZoneType type){
+		//Collider2D hitObject = Physics2D.OverlapBox(playerPos, data.boxCollider.bounds.size, 0f, layer);
+		
+		Collider2D[] hits = Physics2D.OverlapBoxAll(playerPos, data.boxCollider.bounds.size, 0f, layer);
+		Collider2D hitObject = System.Array.Find(hits, h => h.gameObject != data.obj);
+
+		if(hitObject == null){ return false; }
+		CollisionHandler dataScript = hitObject.GetComponent<CollisionHandler>();
+		if(dataScript == null){ return false; }
+		return type == dataScript._zoneType;
+	}
 
 	public static string GetZoneName(PlayerData data, LayerMask layer){
 		Collider2D hitObject = Physics2D.OverlapCircle(data.transform.position, 0.5f, layer);
@@ -46,11 +48,16 @@ public class ChangeSceneObjs : MonoBehaviour{
 	}
 
 	public static void TriggerZoneFunction(PlayerData data, LayerMask layer){
-		Collider2D hitObject = Physics2D.OverlapCircle(data.transform.position, 0.5f, layer);
+		//Collider2D hitObject = Physics2D.OverlapCircle(data.transform.position, 0.5f, layer);
+
+		Collider2D[] hits = Physics2D.OverlapBoxAll(data.transform.position, data.boxCollider.bounds.size, 0f, layer);
+		Collider2D hitObject = System.Array.Find(hits, h => h.gameObject != data.obj);
+
+
 		if(hitObject == null){ goto end; }
 		bool inside = hitObject != null;
 		
-		ChangeSceneObjs dataScript = hitObject.GetComponent<ChangeSceneObjs>();
+		CollisionHandler dataScript = hitObject.GetComponent<CollisionHandler>();
 		if(dataScript == null){ goto end; }
 		
 		HandlePopup(data, hitObject, true);
@@ -96,7 +103,7 @@ public class ChangeSceneObjs : MonoBehaviour{
 	}
 
 
-	private static void HandleDialog(PlayerData data, ChangeSceneObjs dataScript, Collider2D obj){
+	private static void HandleDialog(PlayerData data, CollisionHandler dataScript, Collider2D obj){
 		if(obj == null){ return; }
 		if(dataScript._zoneType != ZoneType.Dialog){ return; }
 		if(!PlayerInteractKey()){ return; }
@@ -120,7 +127,7 @@ public class ChangeSceneObjs : MonoBehaviour{
 
 
 
-	public static void CheckChangeScene(ChangeSceneObjs dataScript){
+	public static void CheckChangeScene(CollisionHandler dataScript){
 		string sceneName = dataScript._targetScene.ToString();
 		if(sceneName == "None"){ return; }
 		SceneController.SwitchScene(sceneName);

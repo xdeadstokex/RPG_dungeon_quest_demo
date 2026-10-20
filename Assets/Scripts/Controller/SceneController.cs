@@ -69,6 +69,8 @@ public class SceneController : MonoBehaviour{
 			_isPreloading = false;
 			_isSwitchingScene = false;
 			_currentTransitionTime = 0f;
+			
+			InputController.OnBeforeSceneChange();
 			SceneUtils.SwitchToPreloadScene();
 		}
 	}

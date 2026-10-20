@@ -13,6 +13,9 @@ public static class SceneUtils{
 		return SceneManager.GetActiveScene().name;
 	}
 
+	public static void BringObjToScene(GameObject obj){
+		SceneManager.MoveGameObjectToScene(obj, SceneManager.GetActiveScene());
+	}
 
     public static void PreloadScene(string name){
         if(_op != null){ return; }
