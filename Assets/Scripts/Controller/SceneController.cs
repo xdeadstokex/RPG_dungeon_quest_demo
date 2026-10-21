@@ -10,7 +10,7 @@ public class SceneController : MonoBehaviour{
 	[SerializeField] private CanvasGroup _fade;
 	[SerializeField] private float _fadeTime = 0.3f;
 	[SerializeField] private float _minLoading = 2f;
-	[SerializeField] private string _transitionScene = "TrasitionScene";
+	[SerializeField] private string _transitionScene = "TransitionScene";
 
 	private bool _isSwitching;
 	public static bool IsSwitching => _instance != null && _instance._isSwitching;
@@ -23,7 +23,7 @@ public class SceneController : MonoBehaviour{
             Destroy(gameObject);
             return;
         }
-
+        _instance = this;
         DontDestroyOnLoad(gameObject);
         _fade.alpha = 0f;
         _fade.blocksRaycasts = false;

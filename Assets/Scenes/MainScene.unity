@@ -694,7 +694,7 @@ MonoBehaviour:
   _fade: {fileID: 1650399866}
   _fadeTime: 0.3
   _minLoading: 2
-  _transitionScene: TrasitionScene
+  _transitionScene: TransitionScene
 --- !u!1 &1255446034
 GameObject:
   m_ObjectHideFlags: 0

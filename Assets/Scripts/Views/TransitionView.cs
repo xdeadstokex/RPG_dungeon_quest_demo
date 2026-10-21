@@ -1,10 +1,10 @@
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class TransitionView : MonoBehaviour
 {
     public static TransitionView Instance { get; private set; }
-    [SerializeField] private Text _percent;
+    [SerializeField] private TextMeshProUGUI _percent;
 
     private void Awake()
     {
