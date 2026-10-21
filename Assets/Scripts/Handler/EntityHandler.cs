@@ -9,14 +9,14 @@ using static GameData;
 
 
 [System.Serializable]
-public class PlayerData{
+public class PlayerData
+{
 	public LayerMask zoneLayer;
-	public LayerMask solidLayer;
 
 	public float popupOffsetX = 0;
 	public float popupOffsetY = 0;
 
-	public Vector2 speed = new(10, 10);
+	public float maxSpeed = 50f;
 	public float accel = 10f;
 	public float decel = 20f;
 
@@ -36,14 +36,22 @@ public class PlayerData{
 
 	[System.NonSerialized]
 	public Transform transform; // ref
-}
+	
+	[System.NonSerialized]
+	public BoxCollider2D boxCollider;
+
+	[System.NonSerialized]
+	public GameObject obj;
+} 
 
 public class EntityHandler : MonoBehaviour{
 
-	[SerializeField] public PlayerData data;
-
+	[SerializeField] private PlayerData data;
 
 	private void Awake(){
+		data.obj = this.gameObject;
+		data.boxCollider = this.GetComponent<BoxCollider2D>();
+
 		data.transform = transform;
 		data.playerStop = Stop;
 
@@ -51,356 +59,89 @@ public class EntityHandler : MonoBehaviour{
 	}
 
 
-
-	public void HandleMovement(){
 	
-	Tick(PlayerMovementInputVetor(), Time.deltaTime, ChangeSceneObjs.IsInZone, data.solidLayer);
-		ChangeSceneObjs.TriggerZoneFunction(this.data, data.zoneLayer);
+	
+public void HandleMovement(){
+
+    float dt = TimeUtils.GetFrameTimeSec();
+
+    float x = 0f, y = 0f;
+
+    if (PlayerMoveRight())     x =  1f;
+    else if (PlayerMoveLeft()) x = -1f;
+    if (PlayerMoveUp())        y =  1f;
+    else if (PlayerMoveDown()) y = -1f;
+
+    float angle;
+    bool moving = true;
+
+    if      (x ==  1 && y ==  0) angle = 0f;
+    else if (x ==  1 && y ==  1) angle = Mathf.PI * 0.25f;
+    else if (x ==  0 && y ==  1) angle = Mathf.PI * 0.5f;
+    else if (x == -1 && y ==  1) angle = Mathf.PI * 0.75f;
+    else if (x == -1 && y ==  0) angle = Mathf.PI;
+    else if (x == -1 && y == -1) angle = Mathf.PI * 1.25f;
+    else if (x ==  0 && y == -1) angle = Mathf.PI * 1.5f;
+    else if (x ==  1 && y == -1) angle = Mathf.PI * 1.75f;
+    else { angle = 0f; moving = false; }
+
+    float s = Mathf.Sqrt(data.maxSpeed);
+    Vector2 target = moving
+        ? new Vector2(s * Mathf.Cos(angle), s * Mathf.Sin(angle))
+        : Vector2.zero;
+
+    float rate = moving ? data.accel : data.decel;
+
+    data.velocity = Vector2.MoveTowards(data.velocity, target, rate * dt);
+
+    moving = data.velocity.sqrMagnitude > 0.01f;
+
+    Vector2 pos  = (Vector2)data.transform.position;
+    Vector2 nextX = pos + new Vector2(data.velocity.x * dt, 0f);
+    Vector2 nextY = pos + new Vector2(0f, data.velocity.y * dt);
+
+    bool canMoveX = !CollisionHandler.IsInZoneType(nextX, data, data.zoneLayer, ZoneType.Solid);
+    bool canMoveY = !CollisionHandler.IsInZoneType(nextY, data, data.zoneLayer, ZoneType.Solid);
+    //Debug.Log(canMoveX + " " + canMoveY + " " + data.velocity);
+
+    if (!canMoveX) data.velocity.x = 0f;
+    if (!canMoveY) data.velocity.y = 0f;
+
+    data.transform.position = pos
+        + new Vector2(canMoveX ? data.velocity.x * dt : 0f,
+                      canMoveY ? data.velocity.y * dt : 0f);
+
+    moving = data.velocity.sqrMagnitude > 0.01f;
+
+    //if (moving != data.wasMoving/* || input != data.lastInput*/) { OnMoveChanged(input, moving); }
+
+    data.wasMoving = moving;
+    //data.lastInput = input;
+
+    CollisionHandler.TriggerZoneFunction(this.data, data.zoneLayer);
+
+    data.anim.SetBool("is_moving", moving);
+    if (moving && data.velocity.sqrMagnitude > 0.01f){
+        data.anim.SetFloat("mx", data.velocity.x);
+        data.anim.SetFloat("my", data.velocity.y);
+    }
+}
+
+
+
+
+
+
+
+	public void Stop(){
+		data.velocity = Vector2.zero;
+		data.wasMoving = false;
+		data.lastInput = Vector2.zero;
+		data.anim.SetFloat("mx", 0);
+        data.anim.SetFloat("my", 0);
 	}
 
-	public void OnMoveChanged(Vector2 direction, bool moving){
-            data.anim.SetBool("is_moving", moving);
-            if (moving && direction.sqrMagnitude > 0.01f){
-                data.anim.SetFloat("mx", direction.x);
-                data.anim.SetFloat("my", direction.y);
-            }
-        }
 
 
-        public void Tick(Vector2 input, float dt, Func<Vector2, LayerMask, bool> collisionChecker, LayerMask layer){
-            if (input.sqrMagnitude > 1){ input.Normalize(); }
 
-            var target = Vector2.Scale(input, data.speed);
-            float rate = input == Vector2.zero ? data.decel : data.accel;
-            data.velocity = Vector2.MoveTowards(data.velocity, target, rate * dt);
-            bool moving = data.velocity.sqrMagnitude > 0.01f;
-
-			//block -> stop animation
-            if (moving && !TryMove(data.velocity * dt, collisionChecker, layer)){ 
-                data.velocity = Vector2.zero;
-                moving = false;
-            }
-
-            if (input != Vector2.zero){ ToCardinal(input); }
-
-            if (moving != data.wasMoving || input != data.lastInput){ OnMoveChanged(input, moving); }
-
-            data.wasMoving = moving;
-            data.lastInput = input;
-        }
-
-        public void Stop(){
-            data.velocity = Vector2.zero;
-            data.wasMoving = false;
-            data.lastInput = Vector2.zero;
-			OnMoveChanged(Vector2.zero, false);
-        }
-
-        private static Vector2 ToCardinal(Vector2 distance){
-            if (Mathf.Abs(distance.x) > Mathf.Abs(distance.y)){ return new Vector2(Mathf.Sign(distance.x), 0); }
-            return new Vector2(0, Mathf.Sign(distance.y));
-        }
-
-        private bool TryMove(Vector2 distance, Func<Vector2, LayerMask, bool> collisionChecker, LayerMask layer){
-            Vector2 pos = data.transform.position;
-            bool moved = false;
-
-            Vector2 moveX = pos + new Vector2(distance.x, 0);
-            Vector2 moveY = pos + new Vector2(0, distance.y);
-
-            if (distance.x != 0){
-                var next = new Vector2(pos.x + distance.x, pos.y);
-				if(!collisionChecker(next, layer)){ pos = next; moved = true; }
-            }
-
-            if (distance.y != 0){
-                var next = new Vector2(pos.x, pos.y + distance.y);  
-				if(!collisionChecker(next, layer)){ pos = next; moved = true; }
-            }
-
-           data.transform.position = pos;
-            return moved;
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-////================  DATA FIELD  =================
-//	[Header("Movement speed")]
-//    public float vx = 10;
-//    public float vy = 10;
-
-//	[Header("Trasition")]
-//    public bool activeMovingTransition = false;
-//    public float transitionTimeSec = 1;
-
-//	[Header("Collision")]
-//	[SerializeField] private float _collisionCheckRadius;
-
-//    [Header("Input")]
-//    public float inputStopThreshold = 0.1f;
-//    private float _inputStopTimer = 0;
-//	private Vector2 _currentInput; 
-//	private Vector2 _lastActiveInput;
-//    private bool _wasMoving = false;
-//    private bool _isDecelerating;
-//    private Vector2 _facingDir = Vector2.down;
-
-//    private Animator _playerAnimation;
-
-
-////==============  HELPER FIELD  =================
-
-//	// may remapped later (custom player keymapping system)
-//	private bool MoveLeft(){	return (KBInputUtils.KeyA() || KBInputUtils.KeyArrowLeft()); }
-//	private bool MoveRight(){	return (KBInputUtils.KeyD() || KBInputUtils.KeyArrowRight()); }
-//	private bool MoveUp(){		return (KBInputUtils.KeyW() || KBInputUtils.KeyArrowUp()); }
-//	private bool MoveDown(){	return (KBInputUtils.KeyS() || KBInputUtils.KeyArrowDown()); }
-
-////================  MAIN FIELD  =================
-//    private void Awake(){
-//		_playerAnimation = GetComponent<Animator>();
-//	}
-
-//    public void HandleUpdate(LayerMask solidObjectLayer, LayerMask interactiveLayer)
-//    {
-//        HandleMovement(solidObjectLayer, interactiveLayer);
-//        HandleDialog(interactiveLayer);
-//		Debug.Log(MouseInputUtils.MouseX() + " " + MouseInputUtils.MouseY());
-
-//		return;
-//    }
-
-
-//    private void HandleMovement(LayerMask solidObjectLayer, LayerMask interactiveLayer)
-//    {
-//        float dt = Time.deltaTime;
-//        _currentInput = ReadBufferedInput(dt);
-//        bool isMoving = _currentInput != Vector2.zero;
-
-//        if (isMoving)
-//            HandleActiveMovement(dt, solidObjectLayer, interactiveLayer);
-//        else
-//            HandleStopMovement(solidObjectLayer, interactiveLayer);
-
-//        _wasMoving = isMoving;
-//    }
-
-//    private void HandleDialog(LayerMask interactiveLayer)
-//    {
-//        if (KBInputUtils.KeyEClick())
-//            Interact(interactiveLayer);
-//        //if (KBInputUtils.KeyXClick())
-//        //    SkipDialog()
-//    }
-
-//    private void Interact(LayerMask interactiveLayer)
-//    {
-//        Vector3 interactPos = transform.position + (Vector3)_facingDir;
-//        //Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
-//        var collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactiveLayer);
-//        if (collider != null)
-//        {
-//            collider.GetComponent<Interactable>()?.Interact();
-//        }
-//    }
-
-//    public void StopMoving()
-//    {
-//        StopAllCoroutines();
-//        _currentInput = Vector2.zero;
-//        _lastActiveInput = Vector2.zero;
-//        _inputStopTimer = inputStopThreshold;
-//        _wasMoving = false;
-//        _isDecelerating = true;
-
-//        _playerAnimation.SetBool("is_moving", false);
-//    }
-
-//    //Input
-//    private Vector2 ReadBufferedInput(float dt){
-//        //float rawX = Input.GetAxis("Horizontal");
-//        //float rawY = Input.GetAxis("Vertical");
-//		float rawX = MoveRight() ? 1f : (MoveLeft() ? -1f : 0f);
-//		float rawY = MoveUp()    ? 1f : (MoveDown() ? -1f : 0f);
-//        bool hasRawInput = rawX != 0f || rawY != 0f;
-
-//        //has input
-//        if (hasRawInput)
-//        {
-//            _inputStopTimer = 0f;
-//            return new Vector2(rawX, rawY);
-//        }
-//        //transition before stop
-//        if (_inputStopTimer < inputStopThreshold)
-//        {
-//            _inputStopTimer += dt;
-//            return _currentInput;
-//        }
-//        return Vector2.zero;
-//    }
-
-//    //Handler
-//    private void HandleActiveMovement(float dt, LayerMask solidObjectLayer, LayerMask interactiveLayer)
-//    {
-//        if (!_wasMoving)
-//            _isDecelerating = false;
-
-//        _lastActiveInput = _currentInput;
-//        UpdateAnimation(_currentInput, true);
-//        TryMove(_currentInput.x * vx * dt, _currentInput.y * vy * dt, solidObjectLayer, interactiveLayer);
-//    }
-
-//    private void HandleStopMovement(LayerMask solidObjectLayer, LayerMask interactiveLayer)
-//    {
-//        if (_isDecelerating)
-//            return;
-
-//        _isDecelerating = true;
-//        float startVx = _lastActiveInput.x * vx;
-//        float startVy = _lastActiveInput.y * vy;
-//        StartCoroutine(DecelerateCoroutine(startVx, startVy, transitionTimeSec, solidObjectLayer, interactiveLayer));
-//    }
-
-
-//    //Slow down coroutine
-//    private IEnumerator DecelerateCoroutine(float startVx, float startVy, float duration, LayerMask solidObjectLayer, LayerMask interactiveLayer)
-//    {
-//        float elapsed = 0f;
-//        while (elapsed < duration)
-//        {
-//            if (!_isDecelerating)
-//                yield break;
-//            float dt = Time.deltaTime;
-//            elapsed += dt;
-
-//            float t = 1f - (elapsed / duration);
-
-//            bool moved = TryMove(startVx * t * dt, startVy * t * dt, solidObjectLayer, interactiveLayer);
-
-//            if (t <= 0.1f || !moved)
-//            {
-//                UpdateAnimation(Vector2.zero, false);
-//                if (!moved)
-//                    yield break;
-//            }
-               
-//            yield return null;
-//        }
-//	}
-
-//    //Move and Collision
-//    //check each axis
-//    private bool TryMove(float dx, float dy, LayerMask solidObjectLayer, LayerMask interactiveLayer)
-//    {
-//        Vector3 targetPos = transform.position;
-//        bool moved = false;
-//        if (dx != 0f)
-//        {
-//            Vector3 targetX = targetPos;
-//            targetX.x += dx;
-//            if (IsWalkable(targetX, solidObjectLayer, interactiveLayer))
-//            {
-//                targetPos.x = targetX.x;
-//                moved = true;
-//            }
-//        }
-//        if (dy != 0f)
-//        {
-//            Vector3 targetY = targetPos;
-//            targetY.y += dy;
-//            if (IsWalkable(targetY, solidObjectLayer, interactiveLayer))
-//            {
-//                targetPos.y = targetY.y;
-//                moved = true;
-//            }
-//        }
-        
-//        transform.position = targetPos;
-//        return moved;
-//    }
-
-
-//	private bool IsWalkable(Vector3 targetPos, LayerMask solidObjectLayer, LayerMask interactiveLayer)
-//	{
-//		if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectLayer | interactiveLayer))
-//			return false;
-//		return true;
-//	}
-    
-//    // Play animation
-//    private void UpdateAnimation(Vector2 direction, bool moving)
-//    {
-//        _playerAnimation.SetBool("is_moving", moving);
-
-//        if (moving && direction.sqrMagnitude > 0.01f)
-//        {
-//            _facingDir = GetFacingDir(direction);
-//            _playerAnimation.SetFloat("mx", direction.x);
-//            _playerAnimation.SetFloat("my", direction.y);
-//        }
-//    }
-
-//    private Vector2 GetFacingDir(Vector2 direction)
-//    {
-//        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
-//            return new Vector2(Mathf.Sign(direction.x), 0);
-//        else
-//            return new Vector2(0, Mathf.Sign(direction.y));
-//    }
-
-
-//	[SerializeField] private GameObject popupIcon;
-
-//	bool _inZone = false;
-//	string oldZoneName = "";
-
-//	public void CheckZone(LayerMask triggerZone){
-//		Collider2D hitObject = Physics2D.OverlapCircle(transform.position, 0.5f, triggerZone);
-//		bool inside = hitObject != null;
-		
-//		if (inside && !_inZone){
-//			_inZone = true;
-//			popupIcon.SetActive(true);
-//			Debug.Log("entered");
-//			Debug.Log(hitObject.gameObject.name);
-//			oldZoneName = hitObject.gameObject.name;
-//		}
-//		else if (!inside && _inZone){
-//			_inZone = false;
-//			popupIcon.SetActive(false);
-//			Debug.Log("fuck you, get out!");
-//			Debug.Log(oldZoneName);
-//		}
-
-//		return;
-//	}
-
-//	public void ChangeScene(LayerMask triggerZone){
-//		Collider2D hitObject = Physics2D.OverlapCircle(transform.position, 0.5f, triggerZone);
-//		bool inside = hitObject != null;
-//		string currentSceneName = SceneManager.GetActiveScene().name;
-//		if(inside && hitObject.gameObject.name == "SceneChangingTestZone"){
-//			if(currentSceneName == "MainScene"){
-//				SceneManager.LoadScene("Test");
-//			}
-			
-//			if(currentSceneName == "Test"){
-//				SceneManager.LoadScene("MainScene");
-//			}
-//		}
-		
-//		return;
-//	}
 }

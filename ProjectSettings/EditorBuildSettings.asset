@@ -14,9 +14,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/FightScene.unity
     guid: 49b5baee79124144aafc00d3e65d7a06
-  - enabled: 0
-    path: Assets/Scenes/Test.unity
-    guid: 2a0548cdeb913d54ea3efcb5d4eb8c6a
+  - enabled: 1
+    path: Assets/Scenes/StartMenu.unity
+    guid: eb9d78cdcabb0c0a5a2739c0005b9ad8
+  - enabled: 1
+    path: Assets/Scenes/CharacterSelection.unity
+    guid: a2b5b94399e99e86f90ef0c444d536b6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

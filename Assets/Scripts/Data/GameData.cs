@@ -12,21 +12,25 @@ public static class GameData{
 		None
 	}
 
+	public enum ZoneType{
+		Portal,
+		Teleport,
+		Solid,
+		Dialog,
+		Fight
+	}
+
 	public static Func<bool> PlayerEscapeKey =			KBInputUtils.KeyEscapeClick;	// default key, can be remap
 	public static Func<bool> PlayerDialogEscapeKey =	KBInputUtils.KeyXClick;			// default key, can be remap
 	public static Func<bool> PlayerInteractKey =		KBInputUtils.KeyEClick;			// default key, can be remap
 
-	public static Func<Vector2> PlayerMovementInputVetor = PlayerMove;
 
-	private static Vector2 PlayerMove(){
-		float x = 0f, y = 0f;
-		if (KBInputUtils.KeyD() || KBInputUtils.KeyArrowRight()){ x = 1f; }
-		else if (KBInputUtils.KeyA() || KBInputUtils.KeyArrowLeft()){ x = -1f; }
-		if (KBInputUtils.KeyW() || KBInputUtils.KeyArrowUp()){ y = 1f; }
-		else if (KBInputUtils.KeyS() || KBInputUtils.KeyArrowDown()){ y = -1f; }
+	public static Func<bool> PlayerMoveLeft = () => KBInputUtils.KeyA() || KBInputUtils.KeyArrowLeft();
+	public static Func<bool> PlayerMoveRight = () => KBInputUtils.KeyD() || KBInputUtils.KeyArrowRight();
+	public static Func<bool> PlayerMoveUp = () => KBInputUtils.KeyW() || KBInputUtils.KeyArrowUp();
+	public static Func<bool> PlayerMoveDown = () => KBInputUtils.KeyS() || KBInputUtils.KeyArrowDown();
 
-		return new Vector2(x, y);
-	}
+
 
 
     // Enums
