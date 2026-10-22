@@ -27,27 +27,73 @@ public class InputController : MonoBehaviour{
 
     private void Awake()
 	{
-		if(_instance != null && _instance != this)
-		{
-			Destroy(gameObject);
-			return;
-		} 
-		_instance = this;
-		DontDestroyOnLoad(gameObject);
-		       
-		if(_instance.mainCam == null)
-		{
-			_instance.mainCam = Camera.main;
-			if(controlledParty.Count == 1)
-				SetCamParent(controlledParty[0], mainCam);
-		}
-
+		Init();
+		MatchCamera();
 	}
 
 
     private void Update()
     {
         FightSceneProgress();
+		ChooseAPartyMember();
+		MoveAllPartyMembers();
+    }
+
+
+    //static funcs
+    public static void OnBeforeSceneChange()
+    {
+        if (_instance == null)
+            return;
+        Debug.Log("ffff");
+
+        if (_instance.mainCam != null)
+        {
+            _instance.mainCam.transform.SetParent(null); // to not let inherit dontdestroyonload
+            _instance.mainCam = null; // to let go for available next slot
+        }
+
+        for (int i = 0; i < _instance.controlledParty.Count; i++)
+            DontDestroyOnLoad(_instance.controlledParty[i]);
+    }
+
+
+    //helper funcs
+    private void Init()
+    {
+        if (!_instance && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+
+    private void MatchCamera()
+    {
+        if (!_instance.mainCam)
+        {
+            _instance.mainCam = Camera.main;
+            if (controlledParty.Count == 1)
+                SetCameraParent(controlledParty[0], mainCam);
+        }
+    }
+
+
+    private void FightSceneProgress()
+    {
+        if (SceneUtils.GetCurrentSceneName() != SceneNames.FightScene.ToString())
+            return;
+        if (PlayerEscapeKey())
+            SceneController.SwitchScene(SceneNames.MainScene.ToString());
+        return;
+    }
+
+
+    private void ChooseAPartyMember()
+    {
         if (controlledParty.Count == 0 && MouseInputUtils.MouseLeftClick())
         {
             GameObject hitEntity = CollisionHandler.GetMouseTarget(zoneLayer);
@@ -55,10 +101,14 @@ public class InputController : MonoBehaviour{
             {
                 controlledParty.Add(hitEntity);
                 if (controlledParty.Count == 1)
-                    SetCamParent(controlledParty[0], mainCam);
+                    SetCameraParent(controlledParty[0], mainCam);
             }
         }
+    }
 
+
+    private void MoveAllPartyMembers()
+    {
         foreach (var participant in controlledParty)
         {
             if (participant.TryGetComponent<EntityHandler>(out var player))
@@ -66,10 +116,8 @@ public class InputController : MonoBehaviour{
         }
     }
 
-    
-	
-	
-	private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+
+    private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
 	{
 		if(_instance != this) 
 			return;
@@ -82,58 +130,15 @@ public class InputController : MonoBehaviour{
 		{
 			mainCam = Camera.main;
 			if(controlledParty.Count == 1)
-				SetCamParent(controlledParty[0], mainCam);
+				SetCameraParent(controlledParty[0], mainCam);
 		}
 	}
 
 
-	private void SetCamParent(GameObject target, Camera cam)
+	private void SetCameraParent(GameObject target, Camera cam)
 	{
 		cam.transform.SetParent(target.transform);
 		//mainCam.transform.localPosition = Vector3.zero; // or your offset
 		cam.transform.localPosition = new Vector3(0f, 0f, cam.transform.localPosition.z);
 	}
-	
-
-
-	private void FightSceneProgress()
-	{
-		if (SceneUtils.GetCurrentSceneName() != SceneNames.FightScene.ToString())
-			return;
-
-		if(PlayerEscapeKey())
-			SceneController.SwitchScene(SceneNames.MainScene.ToString());
-
-		return;
-	}
-	
-
-	public static void OnBeforeSceneChange()
-	{
-		if (_instance == null)
-			return;
-		Debug.Log("ffff");
-
-		if(_instance.mainCam != null)
-			{
-			_instance.mainCam.transform.SetParent(null); // to not let inherit dontdestroyonload
-			_instance.mainCam = null; // to let go for available next slot
-		}
-
-		for(int i = 0; i < _instance.controlledParty.Count; i++)
-		{
-			DontDestroyOnLoad(_instance.controlledParty[i]);
-			//_instance.controlledParty[i].SetActive(false); // dont show in transition
-		}
-		//Destroy(_instance.mainCam.gameObject); // kill the whole object
-	}
-
-
-
-
-
-
-
-
-
 }
