@@ -3,6 +3,7 @@ using System.Collections.Generic; // List
 
 using static GameData;
 using UnityEngine.SceneManagement;
+using Assets.Scripts.SystemUtils;
 
 public class InputController : MonoBehaviour{
 
@@ -49,8 +50,8 @@ public class InputController : MonoBehaviour{
 
         if (_instance.mainCam != null)
         {
-            _instance.mainCam.transform.SetParent(null); // to not let inherit dontdestroyonload
-            _instance.mainCam = null; // to let go for available next slot
+            _instance.mainCam.transform.SetParent(null);
+            _instance.mainCam = null;
         }
 
         for (int i = 0; i < _instance.controlledParty.Count; i++)
@@ -61,7 +62,7 @@ public class InputController : MonoBehaviour{
     //helper funcs
     private void Init()
     {
-        if (!_instance && _instance != this)
+        if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
             return;
@@ -73,11 +74,11 @@ public class InputController : MonoBehaviour{
 
     private void MatchCamera()
     {
-        if (!_instance.mainCam)
+        if (_instance.mainCam != null)
         {
             _instance.mainCam = Camera.main;
             if (controlledParty.Count == 1)
-                SetCameraParent(controlledParty[0], mainCam);
+                CameraUtils.SetCameraParent(controlledParty[0], mainCam);
         }
     }
 
@@ -101,7 +102,7 @@ public class InputController : MonoBehaviour{
             {
                 controlledParty.Add(hitEntity);
                 if (controlledParty.Count == 1)
-                    SetCameraParent(controlledParty[0], mainCam);
+                    CameraUtils.SetCameraParent(controlledParty[0], mainCam);
             }
         }
     }
@@ -130,15 +131,7 @@ public class InputController : MonoBehaviour{
 		{
 			mainCam = Camera.main;
 			if(controlledParty.Count == 1)
-				SetCameraParent(controlledParty[0], mainCam);
+                CameraUtils.SetCameraParent(controlledParty[0], mainCam);
 		}
-	}
-
-
-	private void SetCameraParent(GameObject target, Camera cam)
-	{
-		cam.transform.SetParent(target.transform);
-		//mainCam.transform.localPosition = Vector3.zero; // or your offset
-		cam.transform.localPosition = new Vector3(0f, 0f, cam.transform.localPosition.z);
 	}
 }
