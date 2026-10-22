@@ -41,7 +41,7 @@ public class InputController : MonoBehaviour{
 
 
 	for(int i = 0; i < _instance.controlledParty.Count; i++){
-		SceneUtils.BringObjToScene(_instance.controlledParty[i]);
+		SceneUtils.UnPersistObj(_instance.controlledParty[i]);
 	}
 
 

@@ -13,9 +13,13 @@ public static class SceneUtils{
 		return SceneManager.GetActiveScene().name;
 	}
 
-	public static void BringObjToScene(GameObject obj){
+	public static void UnPersistObj(GameObject obj){
 		SceneManager.MoveGameObjectToScene(obj, SceneManager.GetActiveScene());
 	}
+
+    public static void PersistObj(GameObject obj){
+        Object.DontDestroyOnLoad(obj);
+    }
 
     public static void PreloadScene(string name){
         if(_op != null){ return; }

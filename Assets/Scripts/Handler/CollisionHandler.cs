@@ -13,20 +13,20 @@ public class CollisionHandler : MonoBehaviour{
 
 
 
-	[SerializeField] public SceneNames _targetScene = SceneNames.None;
-	[SerializeField] public ZoneType _zoneType = ZoneType.Portal;
-	[SerializeField] public TriggerType _triggerType = TriggerType.Enter;
+	[SerializeField] private SceneNames _targetScene = SceneNames.None;
+	[SerializeField] private ZoneType _zoneType = ZoneType.Portal;
+	[SerializeField] private TriggerType _triggerType = TriggerType.Enter;
 
 	static public Collider2D _lastHit;
 
 
-		public static GameObject GetMouseTarget(LayerMask layer){
-			Collider2D hit = Physics2D.OverlapPoint(MouseInputUtils.MouseWorldPos2D(), layer);
-			if(hit == null){ return null; }
-			Debug.Log("ol");
-			//if(hit.GetComponent<CollisionHandler>() == null){ return null; } // not interactable
-			return hit.gameObject;
-		}
+	public static GameObject GetMouseTarget(LayerMask layer){
+		Collider2D hit = Physics2D.OverlapPoint(MouseInputUtils.MouseWorldPos2D(), layer);
+		if(hit == null){ return null; }
+		Debug.Log("ol");
+		//if(hit.GetComponent<CollisionHandler>() == null){ return null; } // not interactable
+		return hit.gameObject;
+	}
 
 
 	public static bool IsInZoneType(Vector2 playerPos, PlayerData data, LayerMask layer, ZoneType type){
