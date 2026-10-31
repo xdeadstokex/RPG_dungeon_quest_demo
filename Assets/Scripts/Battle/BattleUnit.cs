@@ -5,21 +5,23 @@ namespace Assets.Scripts.Battle
     public class BattleUnit
     {
         public CharacterData Data { get; }
+        public Team Team { get; }
         public int Hp {  get; private set; }
         public int Mp { get; private set; }
         public bool IsDead => Hp <= 0;
 
 
-        public BattleUnit(CharacterData data)
+        public BattleUnit(CharacterData data, Team team)
         {
             Data = data;
+            Team = team;
             Hp = data.MaxHp;
             Mp = data.StartMp;
         }
 
         public int TakeDamage(int rawDamage)
         {
-            int damage = Mathf.Max(1, rawDamage - Data.Defense);
+            int damage = Mathf.Max(0, rawDamage - Data.Defense);
             Hp = Mathf.Max(0, Hp - damage);
             return damage;
         }

@@ -1,4 +1,6 @@
+using Assets.Scripts.Data;
 using JetBrains.Annotations;
+using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "CharacterData", menuName = "Scriptable Objects/CharacterData")]
@@ -14,6 +16,7 @@ public class CharacterData : ScriptableObject
     [SerializeField, Min(0)] private int _speed = 10;
     [SerializeField, Min(0)] private int _defense = 5;
     [SerializeField, Range(0f, 1f)] private float _critRate = 0.1f;
+    [SerializeField] private SkillData[] _skills;
 
     public string CharacterName => _characterName;
     public Sprite CharacterSprite => _characterSprite;
@@ -23,5 +26,5 @@ public class CharacterData : ScriptableObject
     public int Speed => _speed;
     public int Defense => _defense;
     public float CritRate => _critRate;
-
+    public SkillData[] Skills => _skills;
 }

@@ -1,47 +1,45 @@
 ﻿using UnityEngine;
 using static GameData;
 
-public class CollisionHandler : MonoBehaviour{
-	//[SerializeField] public string _targetScene = "FightScene";
-
-	// have custom detection radius (maybe change to not layer type)
-
-	public enum TriggerType{
-		Click,
-		Enter
-	}
-
-
+public class CollisionHandler : MonoBehaviour
+{
+	public enum TriggerType { Click, Enter } //should be moved
 
 	[SerializeField] private SceneNames _targetScene = SceneNames.None;
 	[SerializeField] private ZoneType _zoneType = ZoneType.Portal;
 	[SerializeField] private TriggerType _triggerType = TriggerType.Enter;
 
-	static public Collider2D _lastHit;
+	public static Collider2D _lastHit;
 
 
-	public static GameObject GetMouseTarget(LayerMask layer){
+	public static GameObject GetMouseTarget(LayerMask layer)
+	{
 		Collider2D hit = Physics2D.OverlapPoint(MouseInputUtils.MouseWorldPos2D(), layer);
-		if(hit == null){ return null; }
+		if (hit == null)
+			return null;
+
 		Debug.Log("ol");
-		//if(hit.GetComponent<CollisionHandler>() == null){ return null; } // not interactable
 		return hit.gameObject;
 	}
 
 
-	public static bool IsInZoneType(Vector2 playerPos, PlayerData data, LayerMask layer, ZoneType type){
-		//Collider2D hitObject = Physics2D.OverlapBox(playerPos, data.boxCollider.bounds.size, 0f, layer);
-		
+	public static bool IsInZoneType(Vector2 playerPos, PlayerData data, LayerMask layer, ZoneType type)
+	{
+		//var 
 		Collider2D[] hits = Physics2D.OverlapBoxAll(playerPos, data.boxCollider.bounds.size, 0f, layer);
 		Collider2D hitObject = System.Array.Find(hits, h => h.gameObject != data.obj);
 
-		if(hitObject == null){ return false; }
-		CollisionHandler dataScript = hitObject.GetComponent<CollisionHandler>();
-		if(dataScript == null){ return false; }
+		if (hitObject == null)
+			return false;
+
+		if (!hitObject.TryGetComponent<CollisionHandler>(out var dataScript))
+			return false;
+
 		return type == dataScript._zoneType;
 	}
 
-	public static string GetZoneName(PlayerData data, LayerMask layer){
+	public static string GetZoneName(PlayerData data, LayerMask layer)
+	{
 		Collider2D hitObject = Physics2D.OverlapCircle(data.transform.position, 0.5f, layer);
 		if(hitObject == null){ return null; }
 		return hitObject.gameObject.name;
@@ -73,8 +71,6 @@ public class CollisionHandler : MonoBehaviour{
 				CheckChangeScene(dataScript);
 			}
 			break;
-
-
 
 			case ZoneType.Fight:
 
