@@ -37,6 +37,7 @@ namespace Assets.Scripts.Controller
         public event Action<BattleUnit> OnTurnStart;
         public event Action<BattleUnit, BattleUnit, int, bool, CommandRanting> OnDamaged;
         public event Action<IActionCommand> OnCommandBegin;
+        public event Action<CommandRanting> OnCommandEnd;
         public event Action<Team> OnBattleEnd;
 
         public Func<BattleUnit, IReadOnlyList<BattleUnit>, IEnumerator> ChooseActionRoutine;
@@ -44,7 +45,7 @@ namespace Assets.Scripts.Controller
 
         public void Start()
         {
-
+            StartCoroutine(BattleLoop());
         }
 
 
@@ -113,14 +114,17 @@ namespace Assets.Scripts.Controller
                 IActionCommand cmd = CommandFactory.Create(choice.Skill);
                 if (cmd != null)
                 {
+                    yield return new WaitForSeconds(0.25f);
                     OnCommandBegin?.Invoke(cmd);
                     yield return cmd.Run(r => rating = r);
+                    OnCommandEnd?.Invoke(rating);
                 }
                 scale = DamageCalculator.AttackScale(rating);
             }
             else
             {
                 var defend = new TimingCommand(0.8f, 0.2f, 0.06f); //just temp for now
+                yield return new WaitForSeconds(0.4f);
                 OnCommandBegin?.Invoke(defend);
                 yield return defend.Run(r => rating = r);
                 scale = DamageCalculator.AttackScale(rating);
