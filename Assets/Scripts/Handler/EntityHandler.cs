@@ -50,9 +50,11 @@ public class PlayerData //should be moved
 public class EntityHandler : MonoBehaviour
 {
 	[SerializeField] private PlayerData data;
+    [SerializeField] private CharacterData _character;
+    public CharacterData Character => _character;
 
 
-	private void Awake()
+    private void Awake()
     {
 		data.obj = gameObject;
 		data.boxCollider = GetComponent<BoxCollider2D>();

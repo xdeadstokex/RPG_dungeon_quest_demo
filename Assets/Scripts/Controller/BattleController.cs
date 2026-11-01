@@ -28,19 +28,23 @@ namespace Assets.Scripts.Controller
     {
         public BattleState State { get; private set; }
         public IBattleMenu Menu { get; set; }
-
+        public IReadOnlyList<BattleUnit> Units => _units;
         private bool _hasChosen;
         private ActionChoice _choice;
         private readonly List<BattleUnit> _units = new();
         private readonly TurnQueue _queue = new();
 
+
         //event for UI
         public event Action<IReadOnlyList<BattleUnit>> OnBattleStart;
         public event Action<BattleUnit> OnTurnStart;
+        public event Action<BattleUnit, SkillData> OnSkillUsed;
         public event Action<BattleUnit, BattleUnit, int, bool, CommandRanting> OnDamaged;
+        public event Action<BattleUnit, BattleUnit, int> OnHealed;
         public event Action<IActionCommand> OnCommandBegin;
         public event Action<CommandRanting> OnCommandEnd;
         public event Action<Team> OnBattleEnd;
+
 
         public Func<BattleUnit, IReadOnlyList<BattleUnit>, IEnumerator> ChooseActionRoutine;
 
@@ -56,12 +60,17 @@ namespace Assets.Scripts.Controller
             State = BattleState.Init;
             BattleListInit();
             OnBattleStart?.Invoke(_units);
-            yield return null;
+            yield return new WaitForSeconds(0.5f);
 
             while (true)
             {
                 State = BattleState.TurnStart;
                 var actor = _queue.Next(_units);
+                if (actor == null)
+                {
+                    EndBattle(Team.Enemy);
+                    yield break;
+                }
                 OnTurnStart?.Invoke(actor);
 
 
@@ -81,18 +90,28 @@ namespace Assets.Scripts.Controller
 
         private IEnumerator ExecuteAction(BattleUnit actor, ActionChoice choice)
         {
-            if (choice.Skill == null || choice.Target == null)
+            SkillData skill = choice.Skill;
+            if (skill == null)
                 yield break;
 
-            if (choice.Skill.MpCost > 0 && !actor.TrySpendMp(choice.Skill.MpCost))
+            List<BattleUnit> targets = BattleTargeting.HandleCastSkillOnTarget(actor, skill, choice.Target, _units);
+            if (targets.Count == 0)
                 yield break;
 
+            if (skill.MpCost > 0 && !actor.TrySpendMp(skill.MpCost))
+                yield break;
+
+            OnSkillUsed?.Invoke(actor, skill);
+
+            bool isPlayer = actor.Team == Team.Player;
+            bool support = BattleTargeting.IsSupportSkill(skill);
             CommandRanting rating = CommandRanting.Good;
             float scale;
 
-            if (actor.Team == Team.Player)
+            if (isPlayer)
             {
-                IActionCommand cmd = CommandFactory.Create(choice.Skill);
+                //player attacks / heals with a timing command
+                IActionCommand cmd = CommandFactory.Create(skill);
                 if (cmd != null)
                 {
                     yield return new WaitForSeconds(0.25f);
@@ -101,25 +120,46 @@ namespace Assets.Scripts.Controller
                     OnCommandEnd?.Invoke(rating);
                 }
                 scale = DamageCalculator.AttackScale(rating);
+                if (support)
+                    scale = Mathf.Max(0.5f, scale); // a missed heal still does something
+            }
+            else if (support)
+            {
+                //enemy buff / heal: nothing to react to
+                yield return new WaitForSeconds(0.4f);
+                scale = 1f;
             }
             else
             {
+                //enemy attacks: the player parries with the timing command
                 var defend = new TimingCommand(0.8f, 0.2f, 0.06f); //just temp for now
                 yield return new WaitForSeconds(0.4f);
                 OnCommandBegin?.Invoke(defend);
                 yield return defend.Run(r => rating = r);
                 OnCommandEnd?.Invoke(rating);
-                scale = DamageCalculator.AttackScale(rating);
+                scale = DamageCalculator.DefendScale(rating);
             }
 
-            int rawDamage = DamageCalculator.Raw(actor, choice.Skill, scale, out bool crit);
-            int dealt = choice.Target.TakeDamage(rawDamage);
+            foreach (var target in targets)
+            {
+                int raw = DamageCalculator.Raw(actor, skill, scale, out bool crit);
+                if (support)
+                {
+                    int before = target.Hp;
+                    target.Heal(raw);
+                    OnHealed?.Invoke(actor, target, target.Hp - before);
+                }
+                else
+                {
+                    int dealt = target.TakeDamage(raw);
+                    OnDamaged?.Invoke(actor, target, dealt, crit, rating);
+                }
+            }
 
-            if (actor.Team == Team.Player)
-                actor.GainMp(choice.Skill.MpGain);
-            OnDamaged?.Invoke(actor, choice.Target, dealt, crit, rating);
+            if (isPlayer)
+                actor.GainMp(skill.MpGain);
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.7f);
         }
 
 
@@ -148,6 +188,12 @@ namespace Assets.Scripts.Controller
                 OnBattleEnd?.Invoke(Team.Enemy);
                 yield break;
             }
+        }
+
+        private void EndBattle(Team winner)
+        {
+            State = winner == Team.Player ? BattleState.Win : BattleState.Lose;
+            OnBattleEnd?.Invoke(winner);
         }
 
         private bool IsTeamAllCleared(Team team)

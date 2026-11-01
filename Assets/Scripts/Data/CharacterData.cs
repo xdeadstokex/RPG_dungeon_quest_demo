@@ -27,4 +27,20 @@ public class CharacterData : ScriptableObject
     public int Defense => _defense;
     public float CritRate => _critRate;
     public SkillData[] Skills => _skills;
+
+
+    //just use for demo
+    public static CharacterData CreateRuntime(string name, int maxHp, int startMp, int baseDamage, int speed, int defense, float critRate)
+    {
+        var c = CreateInstance<CharacterData>();
+        c.hideFlags = HideFlags.HideAndDontSave;
+        c._characterName = name;
+        c._maxHp = maxHp;
+        c._startMp = startMp;
+        c._baseDamage = baseDamage;
+        c._speed = speed;
+        c._defense = defense;
+        c._critRate = critRate;
+        return c;
+    }
 }

@@ -1,9 +1,9 @@
-using UnityEngine;
-using System.Collections.Generic; // List
-
-using static GameData;
-using UnityEngine.SceneManagement;
+using Assets.Scripts.Battle;
 using Assets.Scripts.SystemUtils;
+using System.Collections.Generic; // List
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using static GameData;
 
 public class InputController : MonoBehaviour{
 
@@ -36,6 +36,8 @@ public class InputController : MonoBehaviour{
     private void Update()
     {
         FightSceneProgress();
+        if (IsFightScene())
+            return;
 		ChooseAPartyMember();
 		MoveAllPartyMembers();
     }
@@ -59,7 +61,27 @@ public class InputController : MonoBehaviour{
     }
 
 
+    public static List<CharacterData> GetPartyCharacters()
+    {
+        var result = new List<CharacterData>();
+        if (_instance == null)
+            return result;
+        foreach (var member in _instance.controlledParty)
+        {
+            if (member != null && member.TryGetComponent<EntityHandler>(out var entity) && entity.Character != null)
+                result.Add(entity.Character);
+        }
+        return result;
+    }
+
+
     //helper funcs
+    private static bool IsFightScene()
+    {
+        return SceneUtils.GetCurrentSceneName() == SceneNames.FightScene.ToString();
+    }
+
+
     private void Init()
     {
         if (_instance != null && _instance != this)
@@ -119,19 +141,33 @@ public class InputController : MonoBehaviour{
 
 
     private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
-	{
-		if(_instance != this) 
-			return;
+    {
+        if (_instance != this)
+            return;
 
-		for(int i = 0; i < _instance.controlledParty.Count; i++)
-			SceneUtils.UnPersistObj(_instance.controlledParty[i]);
+        bool fight = scene.name == SceneNames.FightScene.ToString();
 
-		Debug.Log("cam after load: " + mainCam);
-		if(mainCam == null)
-		{
-			mainCam = Camera.main;
-			if(controlledParty.Count == 1)
+        for (int i = 0; i < _instance.controlledParty.Count; i++)
+        {
+            SceneUtils.UnPersistObj(_instance.controlledParty[i]);
+            _instance.controlledParty[i].SetActive(!fight);   
+        }
+
+        if (fight)
+        {
+            mainCam = Camera.main;
+            return;
+        }
+
+        if (scene.name == BattleContext.ReturnScene)
+            BattleContext.FightCooldownUntil = Time.time + 2f;
+
+        Debug.Log("cam after load: " + mainCam);
+        if (mainCam == null)
+        {
+            mainCam = Camera.main;
+            if (controlledParty.Count == 1)
                 CameraUtils.SetCameraParent(controlledParty[0], mainCam);
-		}
-	}
+        }
+    }
 }
