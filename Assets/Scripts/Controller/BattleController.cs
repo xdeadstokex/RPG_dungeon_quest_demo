@@ -29,6 +29,8 @@ namespace Assets.Scripts.Controller
         public BattleState State { get; private set; }
         public IBattleMenu Menu { get; set; }
 
+        private bool _hasChosen;
+        private ActionChoice _choice;
         private readonly List<BattleUnit> _units = new();
         private readonly TurnQueue _queue = new();
 
@@ -52,11 +54,7 @@ namespace Assets.Scripts.Controller
         private IEnumerator BattleLoop()
         {
             State = BattleState.Init;
-            //add all battle unit
-            foreach (var unit in BattleContext.PlayerParty)
-                _units.Add(new BattleUnit(unit, Team.Player));
-            foreach (var unit in BattleContext.Enemies)
-                _units.Add(new BattleUnit(unit, Team.Enemy));
+            BattleListInit();
             OnBattleStart?.Invoke(_units);
             yield return null;
 
@@ -66,37 +64,20 @@ namespace Assets.Scripts.Controller
                 var actor = _queue.Next(_units);
                 OnTurnStart?.Invoke(actor);
 
+
                 State = BattleState.ChoooseAction;
-                ActionChoice choice = default;
-                if (actor.Team == Team.Player && Menu != null)
-                {
-                    bool chosen = false;
-                    Menu.RequestChoice(actor, _units, c => { choice = c; chosen = true; });
-                    yield return new WaitUntil(() => chosen);
-                }
-                else
-                {
-                    choice = EnemyAI.Decide(actor, _units);
-                }
+                yield return GetChoice(actor);
+
 
                 State = BattleState.Execute;
-                yield return ExecuteAction(actor, choice);
+                yield return ExecuteAction(actor, _choice);
+
 
                 State = BattleState.CheckEnd;
-                if (!_units.Any(u => u.Team == Team.Enemy && !u.IsDead))
-                {
-                    State = BattleState.Win;
-                    OnBattleEnd?.Invoke(Team.Player);
-                    yield break;
-                }
-                if (!_units.Any(u => u.Team == Team.Player && !u.IsDead))
-                {
-                    State = BattleState.Lose;
-                    OnBattleEnd?.Invoke(Team.Enemy);
-                    yield break;
-                }
+                yield return HandleIfBattleEnd();
             }
         }
+
 
         private IEnumerator ExecuteAction(BattleUnit actor, ActionChoice choice)
         {
@@ -127,6 +108,7 @@ namespace Assets.Scripts.Controller
                 yield return new WaitForSeconds(0.4f);
                 OnCommandBegin?.Invoke(defend);
                 yield return defend.Run(r => rating = r);
+                OnCommandEnd?.Invoke(rating);
                 scale = DamageCalculator.AttackScale(rating);
             }
 
@@ -138,6 +120,61 @@ namespace Assets.Scripts.Controller
             OnDamaged?.Invoke(actor, choice.Target, dealt, crit, rating);
 
             yield return new WaitForSeconds(0.5f);
+        }
+
+
+        //init
+        private void BattleListInit()
+        {
+            foreach (var unit in BattleContext.PlayerParty)
+                _units.Add(new BattleUnit(unit, Team.Player));
+            foreach (var unit in BattleContext.Enemies)
+                _units.Add(new BattleUnit(unit, Team.Enemy));
+        }
+
+
+        //handle battle end
+        private IEnumerator HandleIfBattleEnd()
+        {
+            if (IsTeamAllCleared(Team.Enemy))
+            {
+                State = BattleState.Win;
+                OnBattleEnd?.Invoke(Team.Player);
+                yield break;
+            }
+            if (IsTeamAllCleared(Team.Player))
+            {
+                State = BattleState.Lose;
+                OnBattleEnd?.Invoke(Team.Enemy);
+                yield break;
+            }
+        }
+
+        private bool IsTeamAllCleared(Team team)
+        {
+            return !_units.Any(u => u.Team == team && !u.IsDead);
+        }
+
+
+        //handle player's choose
+        private void OnPlayerChose(ActionChoice choice)
+        {
+            _choice = choice;
+            _hasChosen = true;
+        }
+
+        private IEnumerator GetChoice(BattleUnit actor)
+        {
+            _hasChosen = false;
+            if (actor.Team == Team.Player)
+            {
+                Menu.RequestChoice(actor, _units, OnPlayerChose);
+                yield return new WaitUntil(() => _hasChosen);
+            }
+            else
+            {
+                _choice = EnemyAI.Decide(actor, _units);
+            }
         }
     }
 }

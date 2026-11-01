@@ -26,6 +26,7 @@ namespace Assets.Scripts.Battle
 
                     if (_queue.Count == 0)
                         return null;
+                    //shot a delegate to UI
                 }
 
                 //get unit (not dead)
