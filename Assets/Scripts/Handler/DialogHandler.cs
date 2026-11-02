@@ -16,8 +16,8 @@ public class DialogHandler : MonoBehaviour {
     public bool _isOpening;
     public bool _isStoping;
 
-    public Action OnOpened;
-    public Action OnClosed;
+    public event Action OnOpened;
+    public event Action OnClosed;
 
     private void Update() {
         if (!_isOpening) { return; }

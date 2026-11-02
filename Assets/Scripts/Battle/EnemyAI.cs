@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.Controller;
-using Assets.Scripts.Data;
 using System.Collections.Generic;
 using System.Linq;
 

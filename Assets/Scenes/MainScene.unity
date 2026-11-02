@@ -730,8 +730,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChangeSceneObjs
   _targetScene: 0
-  _zoneType: 0
+  _zoneType: 4
   _triggerType: 0
+  _enemies:
+  - {fileID: 11400000, guid: 978d1592a72e4ca41b2d111e72f4523a, type: 2}
+  - {fileID: 11400000, guid: 01326245f0226154e84f5a72d1cded36, type: 2}
 --- !u!61 &1255446036
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1409,6 +1412,7 @@ MonoBehaviour:
   _targetScene: 0
   _zoneType: 0
   _triggerType: 0
+  _enemies: []
 --- !u!114 &1577172085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1876,6 +1880,7 @@ MonoBehaviour:
   _targetScene: 3
   _zoneType: 0
   _triggerType: 1
+  _enemies: []
 --- !u!114 &1613701946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2486,6 +2491,7 @@ MonoBehaviour:
   _targetScene: 3
   _zoneType: 2
   _triggerType: 1
+  _enemies: []
 --- !u!1 &1814061755
 GameObject:
   m_ObjectHideFlags: 0
@@ -10971,6 +10977,7 @@ MonoBehaviour:
     accel: 50
     decel: 60
     anim: {fileID: 1979284993}
+  _character: {fileID: 11400000, guid: 01326245f0226154e84f5a72d1cded36, type: 2}
 --- !u!61 &1979284995
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -11053,6 +11060,7 @@ MonoBehaviour:
   _targetScene: 3
   _zoneType: 3
   _triggerType: 1
+  _enemies: []
 --- !u!61 &2056736493
 BoxCollider2D:
   m_ObjectHideFlags: 0

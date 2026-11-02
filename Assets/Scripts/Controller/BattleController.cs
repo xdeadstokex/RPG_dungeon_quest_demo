@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.Battle;
-using Assets.Scripts.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -64,6 +63,7 @@ namespace Assets.Scripts.Controller
 
             while (true)
             {
+                //step 1: choose actor
                 State = BattleState.TurnStart;
                 var actor = _queue.Next(_units);
                 if (actor == null)
@@ -74,14 +74,17 @@ namespace Assets.Scripts.Controller
                 OnTurnStart?.Invoke(actor);
 
 
+                //step 2: choose skill and target
                 State = BattleState.ChoooseAction;
                 yield return GetChoice(actor);
 
 
+                //step 3: execute
                 State = BattleState.Execute;
                 yield return ExecuteAction(actor, _choice);
 
 
+                //step 4: check end
                 State = BattleState.CheckEnd;
                 yield return HandleIfBattleEnd();
             }
@@ -121,18 +124,18 @@ namespace Assets.Scripts.Controller
                 }
                 scale = DamageCalculator.AttackScale(rating);
                 if (support)
-                    scale = Mathf.Max(0.5f, scale); // a missed heal still does something
+                    scale = Mathf.Max(0.5f, scale); //missed heal still heal a little
             }
             else if (support)
             {
-                //enemy buff / heal: nothing to react to
+                //enemy buff/heal -> player do nothing
                 yield return new WaitForSeconds(0.4f);
                 scale = 1f;
             }
             else
             {
-                //enemy attacks: the player parries with the timing command
-                var defend = new TimingCommand(0.8f, 0.2f, 0.06f); //just temp for now
+                //enemy attacks -> player parry with timming command
+                var defend = new TimingCommand(0.8f, 0.0f, 0.06f); //just temp for now
                 yield return new WaitForSeconds(0.4f);
                 OnCommandBegin?.Invoke(defend);
                 yield return defend.Run(r => rating = r);

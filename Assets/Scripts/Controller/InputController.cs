@@ -56,11 +56,14 @@ public class InputController : MonoBehaviour{
             _instance.mainCam = null;
         }
 
+
+        //temp for now
         for (int i = 0; i < _instance.controlledParty.Count; i++)
             DontDestroyOnLoad(_instance.controlledParty[i]);
     }
 
 
+    //temp for now
     public static List<CharacterData> GetPartyCharacters()
     {
         var result = new List<CharacterData>();
@@ -105,6 +108,7 @@ public class InputController : MonoBehaviour{
     }
 
 
+    //temp for now
     private void FightSceneProgress()
     {
         if (SceneUtils.GetCurrentSceneName() != SceneNames.FightScene.ToString())
@@ -115,6 +119,7 @@ public class InputController : MonoBehaviour{
     }
 
 
+    //temp for now
     private void ChooseAPartyMember()
     {
         if (controlledParty.Count == 0 && MouseInputUtils.MouseLeftClick())

@@ -53,5 +53,8 @@ TagManager:
   - name: Popup
     uniqueID: 4019351779
     locked: 0
+  - name: UI
+    uniqueID: 883187157
+    locked: 0
   m_RenderingLayers:
   - Default

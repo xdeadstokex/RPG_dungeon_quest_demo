@@ -1,6 +1,5 @@
 ﻿using Assets.Scripts.Battle;
 using Assets.Scripts.Controller;
-using Assets.Scripts.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,9 +7,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using static GameData;
 
-// Battle screen. Builds its whole uGUI hierarchy from code (no prefab / scene setup needed)
-// and is keyboard only: W/S/A/D or arrows = move, E = confirm / timing hit, X = back.
-public class BattleUI : MonoBehaviour, IBattleMenu
+//W/S/A/D or arrows = move, E = confirm / timing hit, X = back.
+public class BattleHandler : MonoBehaviour, IBattleMenu
 {
     private class UnitView
     {
@@ -21,8 +19,8 @@ public class BattleUI : MonoBehaviour, IBattleMenu
         public Coroutine PopupRoutine;
     }
 
-    private static readonly Color PlayerColor = new Color(0.35f, 0.65f, 1f);
-    private static readonly Color EnemyColor = new Color(1f, 0.45f, 0.4f);
+    private static readonly Color PlayerColor = new(0.35f, 0.65f, 1f);
+    private static readonly Color EnemyColor = new(1f, 0.45f, 0.4f);
 
     private BattleController _battle;
     private readonly Dictionary<BattleUnit, UnitView> _views = new();
@@ -36,8 +34,6 @@ public class BattleUI : MonoBehaviour, IBattleMenu
     private Image _marker;
     private Coroutine _ratingRoutine;
 
-
-    // ------------------------------------------------------------ setup
 
     private void Awake()
     {

@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 public static class SceneUtils{
     private static AsyncOperation _op = null;
 
+    //must not use now 
 	public static void LoadScene(string name){
 		if(name == null){ return; }
 		SceneManager.LoadScene(name);

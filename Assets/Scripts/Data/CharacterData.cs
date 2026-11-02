@@ -1,7 +1,6 @@
-using Assets.Scripts.Data;
-using JetBrains.Annotations;
 using System;
 using UnityEngine;
+
 
 [CreateAssetMenu(fileName = "CharacterData", menuName = "Scriptable Objects/CharacterData")]
 public class CharacterData : ScriptableObject

@@ -1,8 +1,4 @@
-﻿using Assets.Scripts.Data;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts.Battle
 {
@@ -48,7 +44,7 @@ namespace Assets.Scripts.Battle
         public static int Raw(BattleUnit attacker, SkillData skill, float commandScale, out bool crit)
         {
             int baseDmg = attacker.RollAttackDamage(out crit);
-            return Mathf.RoundToInt(baseDmg * skill.Power * commandScale);
+            return Mathf.RoundToInt((baseDmg + skill.Power) * commandScale); //maybe change a little after
         }
     }
 }

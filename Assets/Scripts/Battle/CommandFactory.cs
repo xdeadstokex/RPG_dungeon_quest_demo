@@ -1,9 +1,4 @@
-﻿using Assets.Scripts.Data;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Assets.Scripts.Battle
+﻿namespace Assets.Scripts.Battle
 {
     public static class CommandFactory
     {
@@ -13,6 +8,10 @@ namespace Assets.Scripts.Battle
             {
                 case CommandKind.Timing:
                     return new TimingCommand(skill.CommandDuration, skill.GoodWindow, skill.PerfectWindow);
+                case CommandKind.None:
+                    return null;
+                case CommandKind.Mash:
+                    return null;
                 default:
                     return null;
             }

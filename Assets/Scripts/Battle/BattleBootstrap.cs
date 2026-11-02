@@ -1,13 +1,14 @@
 ﻿using Assets.Scripts.Controller;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static GameData;
 
 namespace Assets.Scripts.Battle
 {
+    /// <summary>
+    ///just use for demo now, entry-point for combat system
+    /// </summary>
     public static class BattleBootstrap
     {
         private const string SystemName = "BattleSystem";
@@ -21,12 +22,15 @@ namespace Assets.Scripts.Battle
 
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (scene.name != SceneNames.FightScene.ToString()) { return; }
-            if (GameObject.Find(SystemName) != null) { return; }
+            if (scene.name != SceneNames.FightScene.ToString())
+                return;
+
+            if (GameObject.Find(SystemName) != null) //avoid duplicate
+                return;
 
             if (!BattleContext.HasData())
             {
-                Debug.LogWarning("BattleContext is empty - starting a demo battle (FightScene opened directly?)");
+                Debug.LogWarning("BattleContext is empty -> starting a demo battle");
                 FillDemo();
             }
 
@@ -34,13 +38,15 @@ namespace Assets.Scripts.Battle
 
             var go = new GameObject(SystemName);
             var battle = go.AddComponent<BattleController>();
-            var ui = go.AddComponent<BattleUI>();
+            var ui = go.AddComponent<BattleHandler>();
             ui.Bind(battle);
         }
 
         private static void EnsureCamera()
         {
-            if (Camera.main != null) { return; }
+            if (Camera.main != null)
+                return;
+
             var go = new GameObject("BattleCamera");
             go.tag = "MainCamera";
             var cam = go.AddComponent<Camera>();

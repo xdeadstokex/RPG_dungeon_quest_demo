@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine.Rendering.Universal;
+﻿using System.Collections.Generic;
 
 namespace Assets.Scripts.Battle
 {
@@ -12,7 +9,7 @@ namespace Assets.Scripts.Battle
         public static string ReturnScene = "MainScene";
         public static List<CharacterData> PlayerParty = new();
         public static List<CharacterData> Enemies = new();
-        public static readonly HashSet<string> ClearedZones = new();
+        public static HashSet<string> ClearedZones = new();
 
 
         public static bool HasData() => PlayerParty.Count > 0 && Enemies.Count > 0;

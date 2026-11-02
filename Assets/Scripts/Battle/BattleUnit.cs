@@ -1,11 +1,11 @@
-﻿using Assets.Scripts.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Battle
 {
     public class BattleUnit
     {
+        private const float BASE_CRIT_SCALE = 1.1f;
         private static SkillData _defaultSkill;
         public static SkillData DefaultSkill
         {
@@ -73,7 +73,7 @@ namespace Assets.Scripts.Battle
         public int RollAttackDamage(out bool isCrit)
         {
             isCrit = Random.value < Data.CritRate;
-            return isCrit ? Mathf.RoundToInt(Data.BaseDamage * 1.5f) : Data.BaseDamage;
+            return isCrit ? Mathf.RoundToInt(Data.BaseDamage * BASE_CRIT_SCALE) : Data.BaseDamage;
         }
 
 
