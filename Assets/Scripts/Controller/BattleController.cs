@@ -135,7 +135,7 @@ namespace Assets.Scripts.Controller
             else
             {
                 //enemy attacks -> player parry with timming command
-                var defend = new TimingCommand(0.8f, 0.0f, 0.06f); //just temp for now
+                var defend = new TimingCommand(0.8f, 0.0f, 0.8f, 0.06f); //just temp for now
                 yield return new WaitForSeconds(0.4f);
                 OnCommandBegin?.Invoke(defend);
                 yield return defend.Run(r => rating = r);

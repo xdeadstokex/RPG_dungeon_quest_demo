@@ -13,6 +13,7 @@ public class SkillData :ScriptableObject
     [SerializeField] private CommandKind _command = CommandKind.Timing;
     [SerializeField, Min(0.2f)] private float _commandDuration = 1f;
     [SerializeField, Range(0.05f, 0.5f)] private float _goodWindow = 0.25f;
+    [SerializeField, Range(0.02f, 0.2f)] private float _missWindow = 0.1f;
     [SerializeField, Range(0.02f, 0.2f)] private float _perfectWindow = 0.08f;
     [SerializeField] private int _mpGain = 1;
 
@@ -23,6 +24,7 @@ public class SkillData :ScriptableObject
     public CommandKind Command => _command;
     public float CommandDuration => _commandDuration;
     public float GoodWindow => _goodWindow;
+    public float MissWindow => _missWindow;
     public float PerfectWindow => _perfectWindow;
     public int MpGain => _mpGain;
 }

@@ -13,12 +13,14 @@ namespace Assets.Scripts.Battle
     {
         private const string SystemName = "BattleSystem";
 
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Register()
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
+
 
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
@@ -36,11 +38,12 @@ namespace Assets.Scripts.Battle
 
             EnsureCamera();
 
-            var go = new GameObject(SystemName);
-            var battle = go.AddComponent<BattleController>();
-            var ui = go.AddComponent<BattleHandler>();
-            ui.Bind(battle);
+            //var go = new GameObject(SystemName);
+            //var battle = go.AddComponent<BattleController>();
+            //var ui = go.AddComponent<BattleHandler>();
+            //ui.Bind(battle);
         }
+
 
         private static void EnsureCamera()
         {
@@ -53,6 +56,7 @@ namespace Assets.Scripts.Battle
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.07f, 0.08f, 0.13f);
         }
+
 
         private static void FillDemo()
         {

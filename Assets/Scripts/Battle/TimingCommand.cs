@@ -8,16 +8,18 @@ namespace Assets.Scripts.Battle
 {
     public class TimingCommand : IActionCommand
     {
-        private readonly float _duration, _good, _perfect;
+        private readonly float _duration, _good, _miss, _perfect;
         public float GoodWindow => _good;
+        public float MissWindow => _miss;
         public float PerfectWindow => _perfect;
         public Action<float> OnProgress; //draw view bar
 
 
-        public TimingCommand(float duration, float good, float perfect)
+        public TimingCommand(float duration, float good, float miss, float perfect)
         {
             _duration = duration;
             _good = good;
+            _miss = miss;
             _perfect = perfect;
         }
 
@@ -36,6 +38,8 @@ namespace Assets.Scripts.Battle
                     float dist = Mathf.Abs(p - 0.5f);
                     if (dist <= _perfect)
                         onDone(CommandRanting.Perfect);
+                    else if (dist <= _miss)
+                        onDone(CommandRanting.Miss);
                     else if (dist <= _good)
                         onDone(CommandRanting.Good);
                     else

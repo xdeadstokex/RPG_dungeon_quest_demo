@@ -7,6 +7,7 @@ namespace Assets.Scripts.Battle
     {
         private const float BASE_CRIT_SCALE = 1.1f;
         private static SkillData _defaultSkill;
+
         public static SkillData DefaultSkill
         {
             get
