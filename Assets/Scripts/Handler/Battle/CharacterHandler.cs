@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Xml;
 using TMPro;
 using UnityEngine;
 
@@ -14,6 +15,16 @@ public class CharacterHandler : MonoBehaviour
     private Coroutine _popupCoroutine;
 
 
+    private void Awake()
+    {
+        if (_popupText != null)
+            _popupText.gameObject.SetActive(false);
+        if (_targetedRenderer != null)
+            _targetedRenderer.gameObject.SetActive(false);
+        if (_highlightRenderer != null)
+            _highlightRenderer.gameObject.SetActive(false);
+    }
+
     public void SetupVisuals(Sprite charSprite)
     {
         if (_mainCharRenderer != null)
@@ -21,15 +32,43 @@ public class CharacterHandler : MonoBehaviour
     }
 
 
-    public void PopupEnable(string text)
+    public void SetHighight(bool on)
     {
-        _popupText.text = text;
-        _popupText.gameObject.SetActive(true);
+        if (_highlightRenderer != null)
+            _highlightRenderer.gameObject.SetActive(on);
     }
 
 
-    public IEnumerator PopupRoutine(Color c)
+    public void ShowMarker()
     {
+        _targetedRenderer.gameObject.SetActive(true);
+    }
+
+
+    public void HideMarker()
+    {
+        _targetedRenderer.gameObject.SetActive(false);
+    }
+
+
+    public void ShowPopup(string text, Color c)
+    {
+        if (_popupText == null)
+            return;
+
+        if (_popupCoroutine != null)
+            StopCoroutine(_popupCoroutine);
+
+        _popupCoroutine = StartCoroutine(PopupRoutine(text, c));
+    }
+
+
+    private IEnumerator PopupRoutine(string text, Color c)
+    {
+        _popupText.text = text;
+        _popupText.color = c;
+        _popupText.gameObject.SetActive(true);
+
         float t = 0f;
         while (t < _popupDuration)
         {
@@ -39,37 +78,8 @@ public class CharacterHandler : MonoBehaviour
             _popupText.color = new Color(c.r, c.g, c.b, 1f - p);
             yield return null;
         }
-    }
 
-
-    public void PopupDisable()
-    {
         _popupText.gameObject.SetActive(false);
         _popupCoroutine = null;
-    }
-
-
-    public void StopCoroutineIfExist()
-    {
-        if (_popupCoroutine != null)
-            StopCoroutine(_popupCoroutine);
-    }
-
-
-    public void AssignCoroutine(Coroutine popupCoroutine)
-    {
-        _popupCoroutine = popupCoroutine;
-    }
-
-
-    public void ShowMarker()
-    {
-        _popupText.gameObject.SetActive(true);
-    }
-
-
-    public void HideMarker()
-    {
-        _popupText.gameObject.SetActive(false);
     }
 }

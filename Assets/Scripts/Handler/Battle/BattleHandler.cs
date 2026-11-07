@@ -3,33 +3,24 @@ using Assets.Scripts.Controller;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
-using UnityEditor;
 using UnityEngine;
 using static GameData;
 
 
-//public class UnitView
-//{
-//    public GameObject gameObject;
-//    public Coroutine popupCoroutine;
-//}
-
-
+[RequireComponent(typeof(BattleController))]
 public class BattleHandler : MonoBehaviour, IBattleMenu
 {
     [SerializeField] private List<Transform> _alliesPosition;
     [SerializeField] private List<Transform> _enemiesPosition;
     [SerializeField] private GameObject _unitPrefab;
-    [SerializeField] private Color _critDameColor;
-    [SerializeField] private Color _normalDameColor;
-    [SerializeField] private Color _missColor;
-    [SerializeField] private Color _parryColor;
-    [SerializeField] private Color _healColor;
+    [SerializeField] private Color _critDameColor = Color.darkRed;
+    [SerializeField] private Color _normalDameColor = Color.white;
+    [SerializeField] private Color _missColor = Color.grey;
+    [SerializeField] private Color _parryColor = Color.yellow;
+    [SerializeField] private Color _healColor = Color.green;
     [SerializeField] private TimingPanelHandler _timingPanel;
     [SerializeField] private ResultPanelHandler _resultPanel;
     [SerializeField] private MenuHandler _menu;
-
 
 
     private BattleController _battle;
@@ -38,24 +29,27 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
     private Dictionary<BattleUnit, CharacterHandler> _views = new();
 
 
-    private void Start()
+    private void Awake()
     {
-        var battleController = GetComponent<BattleController>();
-        Bind(battleController);
+        _battle = GetComponent<BattleController>();
+        _menu.gameObject.SetActive(false);
+        _timingPanel.Hide();
+        _resultPanel.HideResultText();
+        Bind(_battle);
     }
 
 
     public void Bind(BattleController battle)
     {
-        _battle = battle;
-        _battle.OnBattleStart += HandleBattleStart;
-        _battle.OnTurnStart += HandleTurnStart;
-        _battle.OnSkillUsed += HandleSkillUsed;
-        _battle.OnDamaged += HandleDamaged;
-        _battle.OnHealed += HandleHealed;
-        _battle.OnCommandBegin += HandleCommandBegin;
-        _battle.OnCommandEnd += HandleCommandEnd;
-        _battle.OnBattleEnd += HandleBattleEnd;
+        battle.Menu = this;
+        battle.OnBattleStart += HandleBattleStart;
+        battle.OnTurnStart += HandleTurnStart;
+        battle.OnSkillUsed += HandleSkillUsed;
+        battle.OnDamaged += HandleDamaged;
+        battle.OnHealed += HandleHealed;
+        battle.OnCommandBegin += HandleCommandBegin;
+        battle.OnCommandEnd += HandleCommandEnd;
+        battle.OnBattleEnd += HandleBattleEnd;
     }
 
 
@@ -83,18 +77,19 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
         foreach (var unit in units)
             (unit.Team == Team.Player ? players : enemies).Add(unit);
 
-        SpawnTeam(players, true);
-        SpawnTeam(enemies, false);
+        SpawnTeam(players, _alliesPosition);
+        SpawnTeam(enemies, _enemiesPosition);
     }
 
 
-    private void SpawnTeam(List<BattleUnit> team, bool isPlayer)
+    private void SpawnTeam(List<BattleUnit> team, List<Transform> positions)
     {
-        int n = team.Count;
-        List<Transform> listPos = isPlayer ? _alliesPosition : _enemiesPosition;
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < team.Count; i++)
         {
-            GameObject newCharacter = Instantiate(_unitPrefab, listPos[i]);
+            if (positions == null && i >= positions.Count)
+                continue;
+
+            var newCharacter = Instantiate(_unitPrefab, positions[i]);
             CharacterHandler view = newCharacter.GetComponent<CharacterHandler>();
             view.SetupVisuals(team[i].Data.CharacterSprite);
             _views[team[i]] = view;
@@ -105,6 +100,8 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
     private void HandleTurnStart(BattleUnit actor)
     {
         _currentActor = actor;
+        foreach (var view in _views)
+            view.Value.SetHighight(view.Key == actor);
     }
 
 
@@ -131,7 +128,7 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
             popup = "MISS!";
             color = _missColor;
         }
-        else if (!isPlayer && rating == CommandRanting.Miss)
+        else if (!isPlayer && rating == CommandRanting.Perfect)
         {
             popup = "PARRY!";
             color = _parryColor;
@@ -147,20 +144,8 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
 
     private void ShowPopup(BattleUnit unit, string text, Color color)
     {
-        if (!_views.TryGetValue(unit, out var view))
-            return;
-
-        view.StopCoroutineIfExist();
-        view.AssignCoroutine(StartCoroutine(PopupRoutine(view, text, color)));
-
-    }
-
-
-    private IEnumerator PopupRoutine(CharacterHandler view, string text, Color c)
-    {
-        view.PopupEnable(text);
-        yield return view.PopupRoutine(c);
-        view.PopupDisable();
+        if (_views.TryGetValue(unit, out var view))
+            view.ShowPopup(text, color);
     }
 
 
@@ -186,7 +171,7 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
             StopCoroutine(_ratingRoutine);
             _ratingRoutine = null;
         }
-        _timingPanel.HideText();
+        _timingPanel.SetText(text, Color.white);
     }
 
 
@@ -245,11 +230,16 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
         _resultPanel.SetResultText(text);
 
         yield return null;
-        while (!KBInputUtils.KeyEClick())
+        while (PlayerInteractKey())
             yield return null;
 
         BattleContext.Finish(winner);
-        SceneController.SwitchScene(BattleContext.ReturnScene);
+
+        string target = BattleContext.IsDemo ? SceneNames.FightScene.ToString() : BattleContext.ReturnScene;
+        if (SceneController.Exists)
+            SceneController.SwitchScene(target);
+        else
+            SceneUtils.LoadScene(target);
     }
 
 
@@ -292,7 +282,7 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
             }
 
             skill = skills[skillIndex];
-            yield return null;
+            yield return null; //wait next frame to click again
 
             //choose target
             var candidates = BattleTargeting.GetEffectedCandidates(actor, skill, all);
@@ -301,20 +291,19 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
 
             if (BattleTargeting.IsNeedPickingTarget(skill, candidates.Count))
             {
-                int currentTarget = 0;
+                int cur = 0;
                 while (true)
                 {
-                    _views.TryGetValue(candidates[currentTarget], out CharacterHandler currentHandler);
-                    currentHandler.ShowMarker();
+                    SetMarker(candidates[cur], true);
                     if (PlayerMenuUp() || PlayerMenuLeft())
                     {
-                        currentHandler.HideMarker();
-                        currentTarget = (currentTarget - 1 + candidates.Count) % candidates.Count;
+                        SetMarker(candidates[cur], false);
+                        cur = (cur - 1 + candidates.Count) % candidates.Count;
                     }
                     else if (PlayerMenuDown() || PlayerMenuRight())
                     {
-                        currentHandler.HideMarker();
-                        currentTarget = (currentTarget + 1) % candidates.Count;
+                        SetMarker(candidates[cur], false);
+                        cur = (cur + 1) % candidates.Count;
                     }
                     else if (PlayerDialogEscapeKey())
                     {
@@ -323,13 +312,12 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
                     }
                     else if (PlayerInteractKey())
                     {
-                        picked = candidates[currentTarget];
+                        picked = candidates[cur];
                         break;
                     }
                     yield return null;
                 }
-                _views.TryGetValue(candidates[currentTarget], out CharacterHandler current);
-                current.HideMarker();
+                SetMarker(candidates[cur], false);
                 yield return null;
             }
 
@@ -340,5 +328,16 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
 
         _menu.gameObject.SetActive(false);
         onChosen(new ActionChoice { Skill = skill, Target = picked });
+    }
+
+
+    private void SetMarker(BattleUnit unit, bool show)
+    {
+        if (!_views.TryGetValue(unit, out var view)) 
+            return;
+        if (show) 
+            view.ShowMarker(); 
+        else 
+            view.HideMarker();
     }
 }

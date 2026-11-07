@@ -87,6 +87,9 @@ namespace Assets.Scripts.Controller
                 //step 4: check end
                 State = BattleState.CheckEnd;
                 yield return HandleIfBattleEnd();
+
+                if (State == BattleState.Win || State == BattleState.Lose)
+                    yield break;
             }
         }
 
@@ -135,7 +138,7 @@ namespace Assets.Scripts.Controller
             else
             {
                 //enemy attacks -> player parry with timming command
-                var defend = new TimingCommand(0.8f, 0.0f, 0.8f, 0.06f); //just temp for now
+                var defend = new TimingCommand(0.8f, 0.0f, 0.8f, 0.1f); //just temp for now
                 yield return new WaitForSeconds(0.4f);
                 OnCommandBegin?.Invoke(defend);
                 yield return defend.Run(r => rating = r);
@@ -169,6 +172,9 @@ namespace Assets.Scripts.Controller
         //init
         private void BattleListInit()
         {
+            _units.Clear();
+            BattleContext.EnsureData();
+           
             foreach (var unit in BattleContext.PlayerParty)
                 _units.Add(new BattleUnit(unit, Team.Player));
             foreach (var unit in BattleContext.Enemies)

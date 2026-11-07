@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class TimingPanelHandler : MonoBehaviour
 {
+    [SerializeField] private GameObject _bar;
     [SerializeField] private RectTransform _good;
     [SerializeField] private RectTransform _miss;
     [SerializeField] private RectTransform _perfect;
@@ -10,19 +11,22 @@ public class TimingPanelHandler : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _text;
 
     private float _baseWidth;
-    private float _goodWindow;
 
 
     public void Setup(float good, float miss, float perfect)
     {
-        _baseWidth = ((RectTransform)transform).rect.width;
-        _goodWindow = good;
+        gameObject.SetActive(true);
+        if (_bar != null) 
+            _bar.SetActive(true);
 
-        SetBarWidth(_miss, _baseWidth * miss / good);
-        SetBarWidth(_perfect, _baseWidth * perfect / good);
+        _baseWidth = ((RectTransform)transform).rect.width;
+
+        float longestDuration = good == 0 ? miss : good; //for the parry case
+        SetBarWidth(_good, _baseWidth);
+        SetBarWidth(_miss, _baseWidth * miss / longestDuration);
+        SetBarWidth(_perfect, _baseWidth * perfect / longestDuration);
 
         SetCursorOffset(0);
-        gameObject.SetActive(true);
     }
 
 
@@ -37,7 +41,10 @@ public class TimingPanelHandler : MonoBehaviour
 
     public void Hide()
     {
-        gameObject.SetActive(false);
+        if (_bar != null)
+            _bar.SetActive(false);
+        else
+            gameObject.SetActive(false);
     }
 
 
@@ -55,10 +62,13 @@ public class TimingPanelHandler : MonoBehaviour
     }
 
 
-    private static void SetBarWidth(RectTransform bar, float width)
+    private void SetBarWidth(RectTransform bar, float width)
     {
+        if (bar == null)
+            return;
+
         var s = bar.sizeDelta;
-        s.x = width;
+        s.x = Mathf.Clamp(width, 0f, _baseWidth);
         bar.sizeDelta = s;
     }
 }

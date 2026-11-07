@@ -11,6 +11,7 @@ public class InputController : MonoBehaviour{
 
 	[SerializeField] private LayerMask zoneLayer;
 	[SerializeField] private List<GameObject> controlledParty = new();
+    [SerializeField] private List<CharacterData> allies = new();
 	[SerializeField] private Camera mainCam = null;
 
 
@@ -66,15 +67,8 @@ public class InputController : MonoBehaviour{
     //temp for now
     public static List<CharacterData> GetPartyCharacters()
     {
-        var result = new List<CharacterData>();
-        if (_instance == null)
-            return result;
-        foreach (var member in _instance.controlledParty)
-        {
-            if (member != null && member.TryGetComponent<EntityHandler>(out var entity) && entity.Character != null)
-                result.Add(entity.Character);
-        }
-        return result;
+
+        return _instance.allies;
     }
 
 

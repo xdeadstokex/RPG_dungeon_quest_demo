@@ -368,6 +368,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1073741824
   controlledParty: []
+  allies:
+  - {fileID: 11400000, guid: 01326245f0226154e84f5a72d1cded36, type: 2}
+  - {fileID: 11400000, guid: 978d1592a72e4ca41b2d111e72f4523a, type: 2}
+  - {fileID: 11400000, guid: 520e44ae91d74e44f9cb7c1217684bd7, type: 2}
   mainCam: {fileID: 0}
 --- !u!4 &573837325
 Transform:

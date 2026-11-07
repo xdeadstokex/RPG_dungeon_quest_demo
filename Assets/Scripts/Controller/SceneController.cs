@@ -4,7 +4,8 @@ using UnityEngine.SceneManagement;
 using static GameData;
 
 
-public class SceneController : MonoBehaviour{
+public class SceneController : MonoBehaviour
+{
 
 	private static SceneController _instance = null;
     public float _minTransitionTime;
@@ -13,6 +14,8 @@ public class SceneController : MonoBehaviour{
     public bool _isTransiting;
     public bool _isPreloading;
     public string _tagretScene;
+
+    public static bool Exists => _instance != null;
 
 
     private void Awake()

@@ -22,3 +22,4 @@ MonoBehaviour:
   _critRate: 0.1
   _skills:
   - {fileID: 11400000, guid: 3d3763a46c252224aabe240d008f7f7f, type: 2}
+  - {fileID: 11400000, guid: 1a6da6234cf6257448c71ebd98368ceb, type: 2}
