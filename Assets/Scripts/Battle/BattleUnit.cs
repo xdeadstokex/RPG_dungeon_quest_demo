@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Battle
@@ -27,6 +28,8 @@ namespace Assets.Scripts.Battle
         public int Mp { get; private set; }
         public bool IsDead => Hp <= 0;
         public IReadOnlyList<SkillData> Skills { get; }
+        public Action<int, int> OnHpChanged;
+        public Action<int, int> OnMpChanged;
 
 
         public string DisplayName() => string.IsNullOrEmpty(Data.CharacterName) ? Data.name : Data.CharacterName;
@@ -38,6 +41,8 @@ namespace Assets.Scripts.Battle
             Team = team;
             Hp = data.MaxHp;
             Mp = data.StartMp;
+            OnHpChanged?.Invoke(Hp, Hp);
+            OnMpChanged?.Invoke(Mp, Mp);
             Skills = SkillsInit(data);
         }
 
@@ -46,6 +51,7 @@ namespace Assets.Scripts.Battle
         {
             int damage = Mathf.Max(0, rawDamage - Data.Defense);
             Hp = Mathf.Max(0, Hp - damage);
+            OnHpChanged?.Invoke(Hp, Data.MaxHp);
             return damage;
         }
 
@@ -53,12 +59,14 @@ namespace Assets.Scripts.Battle
         public void Heal(int amount)
         {
             Hp = Mathf.Min(Data.MaxHp, Hp + amount);
+            OnHpChanged?.Invoke(Hp, Data.MaxHp);
         }
 
 
         public void GainMp(int amount)
         {
             Mp = Mathf.Min(CharacterData.MaxMp, Mp + amount);
+            OnMpChanged?.Invoke(Mp, Data.StartMp);
         }
 
 
@@ -67,13 +75,14 @@ namespace Assets.Scripts.Battle
             if (Mp < cost)
                 return false;
             Mp -= cost;
+            OnMpChanged?.Invoke(Mp, Data.StartMp);
             return true;
         }
 
 
         public int RollAttackDamage(out bool isCrit)
         {
-            isCrit = Random.value < Data.CritRate;
+            isCrit = UnityEngine.Random.value < Data.CritRate;
             return isCrit ? Mathf.RoundToInt(Data.BaseDamage * BASE_CRIT_SCALE) : Data.BaseDamage;
         }
 

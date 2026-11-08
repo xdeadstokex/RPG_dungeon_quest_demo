@@ -2,6 +2,7 @@ using System.Collections;
 using System.Xml;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CharacterHandler : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class CharacterHandler : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _popupText;
     [SerializeField] private float _popupDuration = 1f;
     [SerializeField] private float _popupRiseDelta = 20f;
+    [SerializeField] private Image _hpFill;
+    [SerializeField] private Image _mpFill;
+
 
     private Coroutine _popupCoroutine;
 
@@ -81,5 +85,19 @@ public class CharacterHandler : MonoBehaviour
 
         _popupText.gameObject.SetActive(false);
         _popupCoroutine = null;
+    }
+
+
+    public void SetHp(int hp, int maxHp)
+    {
+        float ratio = Mathf.Clamp01(hp / maxHp);
+        _hpFill.rectTransform.anchorMax = new Vector2(ratio, 1f);
+    }
+
+
+    public void SetMp(int mp, int maxHp)
+    {
+        float ratio = Mathf.Clamp01(mp / maxHp);
+        _mpFill.rectTransform.anchorMax = new Vector2(ratio, 1f);
     }
 }

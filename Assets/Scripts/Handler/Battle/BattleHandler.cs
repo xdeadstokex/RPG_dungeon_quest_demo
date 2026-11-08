@@ -3,6 +3,7 @@ using Assets.Scripts.Controller;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using static GameData;
 
@@ -21,12 +22,15 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
     [SerializeField] private TimingPanelHandler _timingPanel;
     [SerializeField] private ResultPanelHandler _resultPanel;
     [SerializeField] private MenuHandler _menu;
+    [SerializeField] private TextMeshProUGUI _actorTurn;
+    [SerializeField] private List<BattleUnitHandler> _battleStats;
 
 
     private BattleController _battle;
     private BattleUnit _currentActor;
     private Coroutine _ratingRoutine;
     private Dictionary<BattleUnit, CharacterHandler> _views = new();
+    private Dictionary<BattleUnit, BattleUnitHandler> _stats = new();
 
 
     private void Awake()
@@ -92,7 +96,11 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
             var newCharacter = Instantiate(_unitPrefab, positions[i]);
             CharacterHandler view = newCharacter.GetComponent<CharacterHandler>();
             view.SetupVisuals(team[i].Data.CharacterSprite);
+            team[i].OnHpChanged += view.SetHp;
+            team[i].OnMpChanged += view.SetMp;
+            
             _views[team[i]] = view;
+
         }
     }
 
@@ -100,6 +108,7 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
     private void HandleTurnStart(BattleUnit actor)
     {
         _currentActor = actor;
+        _actorTurn.text = actor.DisplayName() + "'s turn";
         foreach (var view in _views)
             view.Value.SetHighight(view.Key == actor);
     }
