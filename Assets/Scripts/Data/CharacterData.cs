@@ -9,6 +9,7 @@ public class CharacterData : ScriptableObject
 
     [SerializeField] private string _characterName;
     [SerializeField] private Sprite _characterSprite;
+    [SerializeField] private Sprite _characterIcon;
     [SerializeField, Min(1)] private int _maxHp = 100;
     [SerializeField, Range(0, MaxMp)] private int _startMp = 0;
     [SerializeField, Min(0)] private int _baseDamage = 10;
@@ -19,6 +20,7 @@ public class CharacterData : ScriptableObject
 
     public string CharacterName => _characterName;
     public Sprite CharacterSprite => _characterSprite;
+    public Sprite CharacterIcon => _characterIcon;
     public int MaxHp => _maxHp;
     public int StartMp => _startMp;
     public int BaseDamage => _baseDamage;

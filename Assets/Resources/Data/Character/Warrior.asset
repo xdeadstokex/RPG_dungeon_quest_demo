@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   _characterName: Warrior
   _characterSprite: {fileID: 3632281354542172367, guid: cf74ce6fdd388e14693fbe35438c2976, type: 3}
+  _characterIcon: {fileID: -4495828101312305030, guid: d1f4fb2e95a2f364a80560d7191d5e3f, type: 3}
   _maxHp: 200
   _startMp: 3
   _baseDamage: 20

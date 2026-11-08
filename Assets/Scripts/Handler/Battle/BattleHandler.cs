@@ -27,8 +27,9 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
 
 
     private BattleController _battle;
-    private BattleUnit _currentActor;
+    private BattleUnit _currentActor;   
     private Coroutine _ratingRoutine;
+    private int _statIndex;
     private Dictionary<BattleUnit, CharacterHandler> _views = new();
     private Dictionary<BattleUnit, BattleUnitHandler> _stats = new();
 
@@ -77,6 +78,7 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
     {
         var players = new List<BattleUnit>();
         var enemies = new List<BattleUnit>();
+        _statIndex = 0;
 
         foreach (var unit in units)
             (unit.Team == Team.Player ? players : enemies).Add(unit);
@@ -96,11 +98,28 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
             var newCharacter = Instantiate(_unitPrefab, positions[i]);
             CharacterHandler view = newCharacter.GetComponent<CharacterHandler>();
             view.SetupVisuals(team[i].Data.CharacterSprite);
-            team[i].OnHpChanged += view.SetHp;
-            team[i].OnMpChanged += view.SetMp;
-            
             _views[team[i]] = view;
 
+            BattleUnitHandler stat = null;
+            if (team[i].Team == Team.Player && _statIndex < _battleStats.Count)
+            {
+                stat = _battleStats[_statIndex++];
+                stat.SetupActorStat(team[i].DisplayName(), team[i].Data.CharacterIcon);
+                _stats[team[i]] = stat;
+            }
+
+            var unit = team[i];
+            unit.OnStatChanged += u =>
+            {
+                view.SetHp(u.Hp, u.MaxHp);
+                view.SetMp(u.Mp, u.MaxMp);
+                if (stat != null)
+                {
+                    stat.SetHp(u.Hp, u.MaxHp);
+                    stat.SetMp(u.Mp, u.MaxMp);
+                }
+            };
+            unit.RefreshStats();
         }
     }
 

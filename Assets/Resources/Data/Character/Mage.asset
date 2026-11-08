@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   _characterName: Mage
   _characterSprite: {fileID: -4639483513632747057, guid: 400675980fda3614e9c302dd5e2cf5eb, type: 3}
+  _characterIcon: {fileID: -6828792472167061504, guid: d1f4fb2e95a2f364a80560d7191d5e3f, type: 3}
   _maxHp: 100
   _startMp: 4
   _baseDamage: 10

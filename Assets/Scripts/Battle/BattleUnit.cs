@@ -26,14 +26,18 @@ namespace Assets.Scripts.Battle
         public Team Team { get; }
         public int Hp {  get; private set; }
         public int Mp { get; private set; }
+        public int MaxHp => Data.MaxHp;
+        public int MaxMp => CharacterData.MaxMp;
         public bool IsDead => Hp <= 0;
         public IReadOnlyList<SkillData> Skills { get; }
-        public Action<int, int> OnHpChanged;
-        public Action<int, int> OnMpChanged;
+        //public Action<int, int> OnHpChanged;
+        //public Action<int, int> OnMpChanged;
+        public event Action<BattleUnit> OnStatChanged;
 
 
         public string DisplayName() => string.IsNullOrEmpty(Data.CharacterName) ? Data.name : Data.CharacterName;
 
+        public void RefreshStats() => OnStatChanged?.Invoke(this);
 
         public BattleUnit(CharacterData data, Team team)
         {
@@ -41,8 +45,8 @@ namespace Assets.Scripts.Battle
             Team = team;
             Hp = data.MaxHp;
             Mp = data.StartMp;
-            OnHpChanged?.Invoke(Hp, Hp);
-            OnMpChanged?.Invoke(Mp, Mp);
+            //OnHpChanged?.Invoke(Hp, Hp);
+            //OnMpChanged?.Invoke(Mp, Mp);
             Skills = SkillsInit(data);
         }
 
@@ -51,7 +55,7 @@ namespace Assets.Scripts.Battle
         {
             int damage = Mathf.Max(0, rawDamage - Data.Defense);
             Hp = Mathf.Max(0, Hp - damage);
-            OnHpChanged?.Invoke(Hp, Data.MaxHp);
+            OnStatChanged?.Invoke(this);
             return damage;
         }
 
@@ -59,14 +63,14 @@ namespace Assets.Scripts.Battle
         public void Heal(int amount)
         {
             Hp = Mathf.Min(Data.MaxHp, Hp + amount);
-            OnHpChanged?.Invoke(Hp, Data.MaxHp);
+            OnStatChanged?.Invoke(this);
         }
 
 
         public void GainMp(int amount)
         {
             Mp = Mathf.Min(CharacterData.MaxMp, Mp + amount);
-            OnMpChanged?.Invoke(Mp, Data.StartMp);
+            OnStatChanged?.Invoke(this);
         }
 
 
@@ -75,7 +79,7 @@ namespace Assets.Scripts.Battle
             if (Mp < cost)
                 return false;
             Mp -= cost;
-            OnMpChanged?.Invoke(Mp, Data.StartMp);
+            OnStatChanged?.Invoke(this);
             return true;
         }
 

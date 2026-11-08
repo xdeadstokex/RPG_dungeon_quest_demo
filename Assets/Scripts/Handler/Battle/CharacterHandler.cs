@@ -90,14 +90,15 @@ public class CharacterHandler : MonoBehaviour
 
     public void SetHp(int hp, int maxHp)
     {
-        float ratio = Mathf.Clamp01(hp / maxHp);
+        float ratio = Mathf.Clamp01((float)hp / maxHp);
         _hpFill.rectTransform.anchorMax = new Vector2(ratio, 1f);
+        
     }
 
 
     public void SetMp(int mp, int maxHp)
     {
-        float ratio = Mathf.Clamp01(mp / maxHp);
+        float ratio = Mathf.Clamp01((float)mp / maxHp);
         _mpFill.rectTransform.anchorMax = new Vector2(ratio, 1f);
     }
 }
