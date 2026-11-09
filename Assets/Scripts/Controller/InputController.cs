@@ -9,10 +9,10 @@ public class InputController : MonoBehaviour{
 
 	private static InputController _instance = null;
 
-	[SerializeField] private LayerMask zoneLayer;
-	[SerializeField] private List<GameObject> controlledParty = new();
-    [SerializeField] private List<CharacterData> allies = new();
-	[SerializeField] private Camera mainCam = null;
+	[SerializeField] private LayerMask _zoneLayer;
+    [SerializeField] private EntityHandler _player;
+    [SerializeField] private List<CharacterData> _allies = new();
+	//[SerializeField] private Camera mainCam = null;
 
 
     private void OnEnable()
@@ -30,7 +30,7 @@ public class InputController : MonoBehaviour{
     private void Awake()
 	{
 		Init();
-		MatchCamera();
+		//MatchCamera();
 	}
 
 
@@ -39,8 +39,15 @@ public class InputController : MonoBehaviour{
         FightSceneProgress();
         if (IsFightScene())
             return;
-		ChooseAPartyMember();
-		MoveAllPartyMembers();
+        MoveCharacter();
+		//ChooseAPartyMember();
+		//MoveAllPartyMembers();
+    }
+
+
+    private void MoveCharacter()
+    {
+        _player.HandleMovement();
     }
 
 
@@ -51,16 +58,16 @@ public class InputController : MonoBehaviour{
             return;
         Debug.Log("ffff");
 
-        if (_instance.mainCam != null)
-        {
-            _instance.mainCam.transform.SetParent(null);
-            _instance.mainCam = null;
-        }
+        //if (_instance.mainCam != null)
+        //{
+        //    _instance.mainCam.transform.SetParent(null);
+        //    _instance.mainCam = null;
+        //}
 
 
         //temp for now
-        for (int i = 0; i < _instance.controlledParty.Count; i++)
-            DontDestroyOnLoad(_instance.controlledParty[i]);
+        //for (int i = 0; i < _instance.controlledParty.Count; i++)
+        //    DontDestroyOnLoad(_instance.controlledParty[i]);
     }
 
 
@@ -68,7 +75,7 @@ public class InputController : MonoBehaviour{
     public static List<CharacterData> GetPartyCharacters()
     {
 
-        return _instance.allies;
+        return _instance._allies;
     }
 
 
@@ -91,15 +98,15 @@ public class InputController : MonoBehaviour{
     }
 
 
-    private void MatchCamera()
-    {
-        if (_instance.mainCam != null)
-        {
-            _instance.mainCam = Camera.main;
-            if (controlledParty.Count == 1)
-                CameraUtils.SetCameraParent(controlledParty[0], mainCam);
-        }
-    }
+    //private void MatchCamera()
+    //{
+    //    if (_instance.mainCam != null)
+    //    {
+    //        _instance.mainCam = Camera.main;
+    //        if (controlledParty.Count == 1)
+    //            CameraUtils.SetCameraParent(controlledParty[0], mainCam);
+    //    }
+    //}
 
 
     //temp for now
@@ -114,29 +121,29 @@ public class InputController : MonoBehaviour{
 
 
     //temp for now
-    private void ChooseAPartyMember()
-    {
-        if (controlledParty.Count == 0 && MouseInputUtils.MouseLeftClick())
-        {
-            GameObject hitEntity = CollisionHandler.GetMouseTarget(zoneLayer);
-            if (hitEntity != null && hitEntity.TryGetComponent<EntityHandler>(out _))
-            {
-                controlledParty.Add(hitEntity);
-                if (controlledParty.Count == 1)
-                    CameraUtils.SetCameraParent(controlledParty[0], mainCam);
-            }
-        }
-    }
+    //private void ChooseAPartyMember()
+    //{
+    //    if (controlledParty.Count == 0 && MouseInputUtils.MouseLeftClick())
+    //    {
+    //        GameObject hitEntity = CollisionHandler.GetMouseTarget(zoneLayer);
+    //        if (hitEntity != null && hitEntity.TryGetComponent<EntityHandler>(out _))
+    //        {
+    //            controlledParty.Add(hitEntity);
+    //            if (controlledParty.Count == 1)
+    //                CameraUtils.SetCameraParent(controlledParty[0], mainCam);
+    //        }
+    //    }
+    //}
 
 
-    private void MoveAllPartyMembers()
-    {
-        foreach (var participant in controlledParty)
-        {
-            if (participant.TryGetComponent<EntityHandler>(out var player))
-                player.HandleMovement();
-        }
-    }
+    //private void MoveAllPartyMembers()
+    //{
+    //    foreach (var participant in controlledParty)
+    //    {
+    //        if (participant.TryGetComponent<EntityHandler>(out var player))
+    //            player.HandleMovement();
+    //    }
+    //}
 
 
     private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -146,27 +153,27 @@ public class InputController : MonoBehaviour{
 
         bool fight = scene.name == SceneNames.FightScene.ToString();
 
-        for (int i = 0; i < _instance.controlledParty.Count; i++)
-        {
-            SceneUtils.UnPersistObj(_instance.controlledParty[i]);
-            _instance.controlledParty[i].SetActive(!fight);   
-        }
+        //for (int i = 0; i < _instance.controlledParty.Count; i++)
+        //{
+        //    SceneUtils.UnPersistObj(_instance.controlledParty[i]);
+        //    _instance.controlledParty[i].SetActive(!fight);   
+        //}
 
-        if (fight)
-        {
-            mainCam = Camera.main;
-            return;
-        }
+        //if (fight)
+        //{
+        //    mainCam = Camera.main;
+        //    return;
+        //}
 
         if (scene.name == BattleContext.ReturnScene)
             BattleContext.FightCooldownUntil = Time.time + 2f;
 
-        Debug.Log("cam after load: " + mainCam);
-        if (mainCam == null)
-        {
-            mainCam = Camera.main;
-            if (controlledParty.Count == 1)
-                CameraUtils.SetCameraParent(controlledParty[0], mainCam);
-        }
+        //Debug.Log("cam after load: " + mainCam);
+        //if (mainCam == null)
+        //{
+        //    mainCam = Camera.main;
+        //    if (controlledParty.Count == 1)
+        //        CameraUtils.SetCameraParent(controlledParty[0], mainCam);
+        //}
     }
 }

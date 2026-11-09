@@ -6,6 +6,7 @@ using System;
 
 using UnityEngine.SceneManagement;
 using static GameData;
+using System.Collections.Generic;
 
 
 [System.Serializable]
@@ -49,13 +50,27 @@ public class PlayerData //should be moved
 [RequireComponent(typeof(Animator))]
 public class EntityHandler : MonoBehaviour
 {
+    private static Dictionary<string, EntityHandler> _registry = new();
+
+    [SerializeField] private string _id;
 	[SerializeField] private PlayerData data;
     [SerializeField] private CharacterData _character;
+
     public CharacterData Character => _character;
+    public string Id => string.IsNullOrEmpty(_id) ? "NoName" : _id;
 
 
     private void Awake()
     {
+        if (_registry.TryGetValue(Id, out var entity))
+            if (entity != null && entity != this)
+            {
+                gameObject.SetActive(false);
+                Destroy(gameObject);
+                return;
+            }
+        _registry[Id] = this;
+
 		data.obj = gameObject;
 		data.boxCollider = GetComponent<BoxCollider2D>();
 		data.transform = transform;
@@ -65,7 +80,14 @@ public class EntityHandler : MonoBehaviour
             data.anim = GetComponent<Animator>();
 	}
 
-	
+
+    private void OnDestroy()
+    {
+        if (_registry.TryGetValue(Id, out var entity) && entity == this)
+            _registry.Remove(Id);
+    }
+
+
     public void HandleMovement(){
 
         float dt = TimeUtils.GetFrameTimeSec();
@@ -108,6 +130,9 @@ public class EntityHandler : MonoBehaviour
         bool canMoveX = !CollisionHandler.IsInZoneType(nextX, data, data.zoneLayer, ZoneType.Solid);
         bool canMoveY = !CollisionHandler.IsInZoneType(nextY, data, data.zoneLayer, ZoneType.Solid);
         //Debug.Log(canMoveX + " " + canMoveY + " " + data.velocity);
+
+        //bool canMoveX = !CollisionHandler.IsBlocked(nextX, data);
+        //bool canMoveY = !CollisionHandler.IsBlocked(nextY, data);
 
         if (!canMoveX) data.velocity.x = 0f;
         if (!canMoveY) data.velocity.y = 0f;

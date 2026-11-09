@@ -329,11 +329,11 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.34, y: -0.15, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1979284992}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &573837323
 GameObject:
@@ -364,15 +364,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196b77569962a4ec6a79a140a99dfb9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputController
-  zoneLayer:
+  _zoneLayer:
     serializedVersion: 2
     m_Bits: 1073741824
-  controlledParty: []
-  allies:
+  _player: {fileID: 1979284994}
+  _allies:
   - {fileID: 11400000, guid: 01326245f0226154e84f5a72d1cded36, type: 2}
   - {fileID: 11400000, guid: 978d1592a72e4ca41b2d111e72f4523a, type: 2}
   - {fileID: 11400000, guid: 520e44ae91d74e44f9cb7c1217684bd7, type: 2}
-  mainCam: {fileID: 0}
 --- !u!4 &573837325
 Transform:
   m_ObjectHideFlags: 0
@@ -676,7 +675,7 @@ Transform:
   m_GameObject: {fileID: 1026371279}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.78929, y: 5.81971, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10934,7 +10933,8 @@ Transform:
   m_LocalPosition: {x: 3.34, y: -0.15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 519420032}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &1979284993
@@ -10971,6 +10971,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f823121bf705dcf43ad816ed3dd5059f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EntityHandler
+  _id: 
   data:
     zoneLayer:
       serializedVersion: 2
@@ -11316,7 +11317,6 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 519420032}
   - {fileID: 573837325}
   - {fileID: 1026371281}
   - {fileID: 619394802}

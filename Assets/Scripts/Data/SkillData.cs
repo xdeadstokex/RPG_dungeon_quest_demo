@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 [CreateAssetMenu(fileName = "SkillData", menuName = "Scriptable Objects/SkillData")]
-public class SkillData :ScriptableObject
+public class SkillData : ScriptableObject
 {
     [SerializeField] private string _skillName = "Attack";
     [SerializeField, Min(0)] private int _mpCost = 0;

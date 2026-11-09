@@ -5,13 +5,13 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CharacterData", menuName = "Scriptable Objects/CharacterData")]
 public class CharacterData : ScriptableObject
 {
-    public const int MaxMp = 10;
+    public const int MAX_MP = 10;
 
     [SerializeField] private string _characterName;
     [SerializeField] private Sprite _characterSprite;
     [SerializeField] private Sprite _characterIcon;
     [SerializeField, Min(1)] private int _maxHp = 100;
-    [SerializeField, Range(0, MaxMp)] private int _startMp = 0;
+    [SerializeField, Range(0, MAX_MP)] private int _startMp = 0;
     [SerializeField, Min(0)] private int _baseDamage = 10;
     [SerializeField, Min(0)] private int _speed = 10;
     [SerializeField, Min(0)] private int _defense = 5;

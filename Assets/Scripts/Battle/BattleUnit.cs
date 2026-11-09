@@ -27,7 +27,7 @@ namespace Assets.Scripts.Battle
         public int Hp {  get; private set; }
         public int Mp { get; private set; }
         public int MaxHp => Data.MaxHp;
-        public int MaxMp => CharacterData.MaxMp;
+        public int MaxMp => CharacterData.MAX_MP;
         public bool IsDead => Hp <= 0;
         public IReadOnlyList<SkillData> Skills { get; }
         //public Action<int, int> OnHpChanged;
@@ -69,7 +69,7 @@ namespace Assets.Scripts.Battle
 
         public void GainMp(int amount)
         {
-            Mp = Mathf.Min(CharacterData.MaxMp, Mp + amount);
+            Mp = Mathf.Min(CharacterData.MAX_MP, Mp + amount);
             OnStatChanged?.Invoke(this);
         }
 
