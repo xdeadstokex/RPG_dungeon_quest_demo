@@ -164,6 +164,7 @@ public class CollisionHandler : MonoBehaviour
 
         //write a func maybe in scenecontroller (load party/enemies data -> switch to fightscene)
         string current = SceneUtils.GetCurrentSceneName();
+        InputController.SavePlayerPosition();
         BattleContext.Set(party, new List<CharacterData>(zone._enemies));
         BattleContext.ReturnScene = current;
         BattleContext.CurrentId = BattleContext.ZoneId(current, zone.name);

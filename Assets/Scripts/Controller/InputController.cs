@@ -1,19 +1,19 @@
 using Assets.Scripts.Battle;
 using Assets.Scripts.SystemUtils;
 using System.Collections.Generic; // List
+using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static GameData;
 
-public class InputController : MonoBehaviour{
+public class InputController : MonoBehaviour {
 
-	private static InputController _instance = null;
+    private static InputController _instance = null;
 
-	[SerializeField] private LayerMask _zoneLayer;
-    [SerializeField] private EntityHandler _player;
+    [SerializeField] private LayerMask _zoneLayer;
     [SerializeField] private List<CharacterData> _allies = new();
-	//[SerializeField] private Camera mainCam = null;
 
+    private EntityHandler _player;
 
     private void OnEnable()
     {
@@ -27,11 +27,17 @@ public class InputController : MonoBehaviour{
     }
 
 
+    private void Start()
+    {
+        if (_instance == this)
+            BindPlayer();
+    }
+
+
     private void Awake()
-	{
-		Init();
-		//MatchCamera();
-	}
+    {
+        SingletonInit();
+    }
 
 
     private void Update()
@@ -39,54 +45,13 @@ public class InputController : MonoBehaviour{
         FightSceneProgress();
         if (IsFightScene())
             return;
-        MoveCharacter();
-		//ChooseAPartyMember();
-		//MoveAllPartyMembers();
-    }
-
-
-    private void MoveCharacter()
-    {
-        _player.HandleMovement();
-    }
-
-
-    //static funcs
-    public static void OnBeforeSceneChange()
-    {
-        if (_instance == null)
+        if (_player == null)
             return;
-        Debug.Log("ffff");
-
-        //if (_instance.mainCam != null)
-        //{
-        //    _instance.mainCam.transform.SetParent(null);
-        //    _instance.mainCam = null;
-        //}
-
-
-        //temp for now
-        //for (int i = 0; i < _instance.controlledParty.Count; i++)
-        //    DontDestroyOnLoad(_instance.controlledParty[i]);
+        MoveCharacter();
     }
 
 
-    //temp for now
-    public static List<CharacterData> GetPartyCharacters()
-    {
-
-        return _instance._allies;
-    }
-
-
-    //helper funcs
-    private static bool IsFightScene()
-    {
-        return SceneUtils.GetCurrentSceneName() == SceneNames.FightScene.ToString();
-    }
-
-
-    private void Init()
+    private void SingletonInit()
     {
         if (_instance != null && _instance != this)
         {
@@ -98,15 +63,67 @@ public class InputController : MonoBehaviour{
     }
 
 
-    //private void MatchCamera()
-    //{
-    //    if (_instance.mainCam != null)
-    //    {
-    //        _instance.mainCam = Camera.main;
-    //        if (controlledParty.Count == 1)
-    //            CameraUtils.SetCameraParent(controlledParty[0], mainCam);
-    //    }
-    //}
+    private void BindPlayer()
+    {
+        _player = null;
+        var all = FindObjectsByType<EntityHandler>(FindObjectsSortMode.None);
+        foreach (var e in all)
+            if (e.IsPlayer)
+            {
+                _player = e;
+                break;
+            }
+    }
+
+
+    private void MoveCharacter()
+    {
+        _player.HandleMovement();
+    }
+
+
+    public static void SavePlayerPosition()
+    {
+        if (_instance == null || _instance._player == null)
+            return;
+
+        BattleContext.ReturnPosition = _instance._player.transform.position;
+        BattleContext.HasReturnPosition = true;
+    }
+
+
+    private void RestorePlayerPosition()
+    {
+        if (!BattleContext.HasReturnPosition || _player == null)
+            return;
+
+        _player.transform.position = BattleContext.ReturnPosition;
+        _player.Stop();
+        BattleContext.HasReturnPosition = false;
+    }
+
+
+    //static funcs
+    public static void OnBeforeSceneChange()
+    {
+        if (_instance == null)
+            return;
+        Debug.Log("ffff");
+    }
+
+
+    //temp for now
+    public static List<CharacterData> GetPartyCharacters()
+    {
+        return _instance._allies;
+    }
+
+
+    //helper funcs
+    private static bool IsFightScene()
+    {
+        return SceneUtils.GetCurrentSceneName() == SceneNames.FightScene.ToString();
+    }
 
 
     //temp for now
@@ -120,60 +137,17 @@ public class InputController : MonoBehaviour{
     }
 
 
-    //temp for now
-    //private void ChooseAPartyMember()
-    //{
-    //    if (controlledParty.Count == 0 && MouseInputUtils.MouseLeftClick())
-    //    {
-    //        GameObject hitEntity = CollisionHandler.GetMouseTarget(zoneLayer);
-    //        if (hitEntity != null && hitEntity.TryGetComponent<EntityHandler>(out _))
-    //        {
-    //            controlledParty.Add(hitEntity);
-    //            if (controlledParty.Count == 1)
-    //                CameraUtils.SetCameraParent(controlledParty[0], mainCam);
-    //        }
-    //    }
-    //}
-
-
-    //private void MoveAllPartyMembers()
-    //{
-    //    foreach (var participant in controlledParty)
-    //    {
-    //        if (participant.TryGetComponent<EntityHandler>(out var player))
-    //            player.HandleMovement();
-    //    }
-    //}
-
-
     private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (_instance != this)
             return;
 
-        bool fight = scene.name == SceneNames.FightScene.ToString();
-
-        //for (int i = 0; i < _instance.controlledParty.Count; i++)
-        //{
-        //    SceneUtils.UnPersistObj(_instance.controlledParty[i]);
-        //    _instance.controlledParty[i].SetActive(!fight);   
-        //}
-
-        //if (fight)
-        //{
-        //    mainCam = Camera.main;
-        //    return;
-        //}
+        BindPlayer();
 
         if (scene.name == BattleContext.ReturnScene)
+        {
             BattleContext.FightCooldownUntil = Time.time + 2f;
-
-        //Debug.Log("cam after load: " + mainCam);
-        //if (mainCam == null)
-        //{
-        //    mainCam = Camera.main;
-        //    if (controlledParty.Count == 1)
-        //        CameraUtils.SetCameraParent(controlledParty[0], mainCam);
-        //}
+            RestorePlayerPosition();
+        }
     }
 }

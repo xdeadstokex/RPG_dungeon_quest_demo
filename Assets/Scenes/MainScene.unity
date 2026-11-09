@@ -367,7 +367,6 @@ MonoBehaviour:
   _zoneLayer:
     serializedVersion: 2
     m_Bits: 1073741824
-  _player: {fileID: 1979284994}
   _allies:
   - {fileID: 11400000, guid: 01326245f0226154e84f5a72d1cded36, type: 2}
   - {fileID: 11400000, guid: 978d1592a72e4ca41b2d111e72f4523a, type: 2}
@@ -693,12 +692,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 396f4909f5000b727b47722f517ed6fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneController
-  _minTransitionTime: 0
+  _minTransitionTime: 1
   _currentTransitionTime: 0
-  _isSwitchingScene: 0
-  _isTransiting: 0
-  _isPreloading: 0
-  _tagretScene: 
 --- !u!1 &1255446034
 GameObject:
   m_ObjectHideFlags: 0
@@ -10971,7 +10966,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f823121bf705dcf43ad816ed3dd5059f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EntityHandler
-  _id: 
+  _id: Player
+  _isPlayer: 1
   data:
     zoneLayer:
       serializedVersion: 2

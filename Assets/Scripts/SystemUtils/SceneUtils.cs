@@ -22,8 +22,11 @@ public static class SceneUtils{
         Object.DontDestroyOnLoad(obj);
     }
 
-    public static void PreloadScene(string name){
-        if(_op != null){ return; }
+    public static void PreloadScene(string name)
+    {
+        if (_op != null)
+            return;
+
         _op = SceneManager.LoadSceneAsync(name);
         _op.allowSceneActivation = false;
     }

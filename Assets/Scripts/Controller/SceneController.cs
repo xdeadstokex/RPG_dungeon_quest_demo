@@ -7,33 +7,27 @@ using static GameData;
 public class SceneController : MonoBehaviour
 {
 	private static SceneController _instance = null;
-    public float _minTransitionTime;
-    public float _currentTransitionTime;
-    public bool _isSwitchingScene;
-    public bool _isTransiting;
-    public bool _isPreloading;
-    public string _tagretScene;
+
+    [SerializeField] private float _minTransitionTime;
+    [SerializeField] private float _currentTransitionTime;
+
+    private bool _isSwitchingScene;
+    private bool _isTransiting;
+    private bool _isPreloading;
+    private string _tagretScene;
 
     public static bool Exists => _instance != null;
 
 
     private void Awake()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _instance = this;
-        DontDestroyOnLoad(gameObject);
+        SingletonInit();
 
-        this._minTransitionTime = 2f;
-        this._currentTransitionTime = 0f;
-        this._isSwitchingScene = false;
-        this._isTransiting = false;
-        this._isPreloading = false;
-        this._tagretScene = null;
-        return;
+        _currentTransitionTime = 0f;
+        _isSwitchingScene = false;
+        _isTransiting = false;
+        _isPreloading = false;
+        _tagretScene = null;
     }
 
 
@@ -44,23 +38,27 @@ public class SceneController : MonoBehaviour
 
         string transitionScene = SceneNames.TransitionScene.ToString();
 
+        //case in the target scene
         if (SceneUtils.GetCurrentSceneName() == _tagretScene)
         {
             _tagretScene = null;
             _isTransiting = false;
         }
 
+        //only just turn into the transitionscene
         if (!_isTransiting && SceneUtils.GetCurrentSceneName() == transitionScene)
         {
             _isSwitchingScene = true;
             _isTransiting = true;
         }
 
+        //not in the transition scene
         if (_tagretScene != null && !_isTransiting)
         {
             SwitchingScene(transitionScene);
         }
 
+        //turn into targetscene
         if (_tagretScene != null && _isTransiting)
         {
             SwitchingScene(_tagretScene);
@@ -69,9 +67,22 @@ public class SceneController : MonoBehaviour
     }
 
 
+    private void SingletonInit()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+
     private void SwitchingScene(string target)
     {
-        if (!_isSwitchingScene) { return; }
+        if (!_isSwitchingScene)
+            return;
 
         if (!_isPreloading)
         {
@@ -81,7 +92,9 @@ public class SceneController : MonoBehaviour
         }
 
         _currentTransitionTime += TimeUtils.GetFrameTimeSec();
-        if (_currentTransitionTime >= _minTransitionTime && SceneUtils.GetPreloadSceneStatus())
+
+        if ((_currentTransitionTime >= _minTransitionTime || !_isTransiting) && SceneUtils.GetPreloadSceneStatus())
+        //if (SceneUtils.GetPreloadSceneStatus())
         {
             _isPreloading = false;
             _isSwitchingScene = false;

@@ -53,9 +53,11 @@ public class EntityHandler : MonoBehaviour
     private static Dictionary<string, EntityHandler> _registry = new();
 
     [SerializeField] private string _id;
+    [SerializeField] private bool _isPlayer;
 	[SerializeField] private PlayerData data;
     [SerializeField] private CharacterData _character;
 
+    public bool IsPlayer => _isPlayer;
     public CharacterData Character => _character;
     public string Id => string.IsNullOrEmpty(_id) ? "NoName" : _id;
 

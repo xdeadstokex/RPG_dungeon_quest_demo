@@ -13,6 +13,8 @@ namespace Assets.Scripts.Battle
         public static List<CharacterData> Enemies = new();
         public static HashSet<string> ClearedZones = new();
         public static bool IsDemo { get; private set; }
+        public static Vector3 ReturnPosition;
+        public static bool HasReturnPosition = false;
 
         public static bool HasData() => PlayerParty.Count > 0 && Enemies.Count > 0;
         public static string ZoneId(string sceneName, string zoneName) => sceneName + "/" + zoneName;
