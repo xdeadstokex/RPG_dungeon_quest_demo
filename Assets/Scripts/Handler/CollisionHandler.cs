@@ -13,7 +13,7 @@ public class CollisionHandler : MonoBehaviour{
     [SerializeField] private SceneNames _targetScene = SceneNames.None;
     [SerializeField] private ZoneType _zoneType = ZoneType.Portal;
     [SerializeField] private TriggerType _triggerType = TriggerType.Enter;
-    [SerializeField] private CharacterData[] _enemies;
+    [SerializeField] private List<CharacterData> _enemies;
     //must change to just id then load enemies data from db with this id
 
     public static Collider2D _lastHit;
@@ -135,7 +135,7 @@ public class CollisionHandler : MonoBehaviour{
     public static void StartFight(CollisionHandler zone){
         if (Time.time < BattleContext.FightCooldownUntil){ return; }
 
-        if (zone._enemies == null || zone._enemies.Length == 0){
+        if (zone._enemies == null || zone._enemies.Count == 0){
             Debug.LogWarning("Fight zone '" + zone.name + "' has no enemies assigned");
             return;
         }
@@ -149,7 +149,8 @@ public class CollisionHandler : MonoBehaviour{
         //write a func maybe in scenecontroller (load party/enemies data -> switch to fightscene)
         string current = SceneUtils.GetCurrentSceneName();
         InputController.SavePlayerPosition();
-        BattleContext.Set(party, new List<CharacterData>(zone._enemies));
+        Debug.Log(party.Count + "/" + zone._enemies.Count);
+        BattleContext.Set(party, zone._enemies);
         BattleContext.ReturnScene = current;
         BattleContext.CurrentId = BattleContext.ZoneId(current, zone.name);
         SceneController.SwitchScene(SceneNames.FightScene.ToString());

@@ -4430,12 +4430,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196b77569962a4ec6a79a140a99dfb9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UserInputController
-  zoneLayer:
+  _zoneLayer:
     serializedVersion: 2
     m_Bits: 0
-  controlledParty: []
-  allies: []
-  mainCam: {fileID: 0}
+  _allies: []
 --- !u!4 &1221981918
 Transform:
   m_ObjectHideFlags: 0
@@ -5424,10 +5422,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SceneController
   _minTransitionTime: 0
   _currentTransitionTime: 0
-  _isSwitchingScene: 0
-  _isTransiting: 0
-  _isPreloading: 0
-  _tagretScene: 
 --- !u!1 &1893433706
 GameObject:
   m_ObjectHideFlags: 0
@@ -5647,7 +5641,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 883187157
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1939948909
 RectTransform:

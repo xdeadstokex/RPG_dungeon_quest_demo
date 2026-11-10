@@ -17,7 +17,7 @@ MonoBehaviour:
   _power: 10
   _target: 0
   _command: 1
-  _commandDuration: 2
   _goodWindow: 0.5
-  _perfectWindow: 0.2
+  _missWindow: 0.2
+  _perfectWindow: 0.05
   _mpGain: 1

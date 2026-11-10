@@ -21,10 +21,10 @@ public class TimingPanelHandler : MonoBehaviour
 
         _baseWidth = ((RectTransform)transform).rect.width;
 
-        float longestDuration = good == 0 ? miss : good; //for the parry case
-        SetBarWidth(_good, _baseWidth);
-        SetBarWidth(_miss, _baseWidth * miss / longestDuration);
-        SetBarWidth(_perfect, _baseWidth * perfect / longestDuration);
+        float total = 2f * Mathf.Max(good, miss, perfect);
+        SetBarWidth(_good, _baseWidth * 2f * good / total);
+        SetBarWidth(_miss, _baseWidth * 2f * miss / total);
+        SetBarWidth(_perfect, _baseWidth * 2f * perfect / total);
 
         SetCursorOffset(0);
     }

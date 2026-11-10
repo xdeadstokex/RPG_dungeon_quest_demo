@@ -15,12 +15,12 @@ namespace Assets.Scripts.Battle
         public Action<float> OnProgress; //draw view bar
 
 
-        public TimingCommand(float duration, float good, float miss, float perfect)
+        public TimingCommand(float good, float miss, float perfect)
         {
-            _duration = duration;
             _good = good;
             _miss = miss;
             _perfect = perfect;
+            _duration = 2 * Mathf.Max(good, miss, perfect);
         }
 
 

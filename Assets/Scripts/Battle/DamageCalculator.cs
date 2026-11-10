@@ -22,7 +22,7 @@ namespace Assets.Scripts.Battle
                 case CommandRanting.Miss:
                     return MISS_ATTACK;
                 default:
-                    return PERFECT_ATTACK;
+                    return MISS_ATTACK;
             }
         }
 

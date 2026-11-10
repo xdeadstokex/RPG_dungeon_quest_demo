@@ -126,8 +126,8 @@ namespace Assets.Scripts.Controller
                     OnCommandEnd?.Invoke(rating);
                 }
                 scale = DamageCalculator.AttackScale(rating);
-                if (support)
-                    scale = Mathf.Max(0.5f, scale); //missed heal still heal a little
+                //if (support)
+                //    scale = Mathf.Max(0.5f, scale); //missed heal still heal a little
             }
             else if (support)
             {
@@ -138,7 +138,7 @@ namespace Assets.Scripts.Controller
             else
             {
                 //enemy attacks -> player parry with timming command
-                var defend = new TimingCommand(0.8f, 0.0f, 0.8f, 0.1f); //just temp for now
+                var defend = new TimingCommand(0.0f, 0.4f, 0.05f); //just temp for now
                 yield return new WaitForSeconds(0.4f);
                 OnCommandBegin?.Invoke(defend);
                 yield return defend.Run(r => rating = r);

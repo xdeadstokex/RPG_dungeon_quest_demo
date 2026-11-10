@@ -24,6 +24,10 @@ namespace Assets.Scripts.Battle
         {
             PlayerParty = party;
             Enemies = enemies;
+            //foreach (var item in PlayerParty) 
+            //    Debug.Log(item.CharacterName.ToString());
+            //foreach (var item in Enemies)
+            //    Debug.Log(item.CharacterName.ToString());
             IsDemo = false;
         }
 

@@ -258,7 +258,7 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
         _resultPanel.SetResultText(text);
 
         yield return null;
-        while (PlayerInteractKey())
+        while (!PlayerInteractKey())
             yield return null;
 
         BattleContext.Finish(winner);
