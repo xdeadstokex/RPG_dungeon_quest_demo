@@ -17,13 +17,17 @@ public class CharacterHandler : MonoBehaviour
 
 
     private Coroutine _popupCoroutine;
-    private Vector2 _popupTextPos;
+    private Vector2 _popupOrigin;
 
 
     private void Awake()
     {
         if (_popupText != null)
+        {
+            _popupOrigin = _popupText.rectTransform.anchoredPosition;
             _popupText.gameObject.SetActive(false);
+        }
+            
         if (_targetedRenderer != null)
             _targetedRenderer.gameObject.SetActive(false);
         if (_highlightRenderer != null)
@@ -70,22 +74,23 @@ public class CharacterHandler : MonoBehaviour
 
     private IEnumerator PopupRoutine(string text, Color c)
     {
+        var reactTransform = _popupText.rectTransform;
+        reactTransform.anchoredPosition = _popupOrigin;
         _popupText.text = text;
         _popupText.color = c;
         _popupText.gameObject.SetActive(true);
 
-        _popupTextPos = _popupText.rectTransform.anchoredPosition;
         float t = 0f;
         while (t < _popupDuration)
         {
             t += TimeUtils.GetFrameTimeSec();
             float p = Mathf.Clamp01(t / _popupDuration);
-            _popupText.rectTransform.anchoredPosition = new Vector2(_popupTextPos.x, _popupRiseDelta * p);
+            reactTransform.anchoredPosition = _popupOrigin + new Vector2(0f, _popupRiseDelta * p);
             _popupText.color = new Color(c.r, c.g, c.b, 1f - p);
             yield return null;
         }
 
-        _popupText.rectTransform.anchoredPosition = _popupTextPos;
+        reactTransform.anchoredPosition = _popupOrigin;
         _popupText.gameObject.SetActive(false);
         _popupCoroutine = null;
     }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Healer
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   _characterName: Healer
-  _characterSprite: {fileID: 2155247073474788533, guid: 400675980fda3614e9c302dd5e2cf5eb, type: 3}
+  _characterSprite: {fileID: 6993075624325942739, guid: 531ce30eb6fa5cf40896d01db4cd1459, type: 3}
   _characterIcon: {fileID: 4158285534639744989, guid: d1f4fb2e95a2f364a80560d7191d5e3f, type: 3}
   _maxHp: 100
   _startMp: 4

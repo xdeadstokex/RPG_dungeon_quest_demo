@@ -92,7 +92,7 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
     {
         for (int i = 0; i < team.Count; i++)
         {
-            if (positions == null && i >= positions.Count)
+            if (positions == null || i >= positions.Count)
                 continue;
 
             var newCharacter = Instantiate(_unitPrefab, positions[i]);
