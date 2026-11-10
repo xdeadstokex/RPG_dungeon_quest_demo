@@ -17,6 +17,7 @@ public class CharacterHandler : MonoBehaviour
 
 
     private Coroutine _popupCoroutine;
+    private Vector2 _popupTextPos;
 
 
     private void Awake()
@@ -73,16 +74,18 @@ public class CharacterHandler : MonoBehaviour
         _popupText.color = c;
         _popupText.gameObject.SetActive(true);
 
+        _popupTextPos = _popupText.rectTransform.anchoredPosition;
         float t = 0f;
         while (t < _popupDuration)
         {
             t += TimeUtils.GetFrameTimeSec();
             float p = Mathf.Clamp01(t / _popupDuration);
-            _popupText.rectTransform.anchoredPosition = new Vector2(0f, _popupRiseDelta * p);
+            _popupText.rectTransform.anchoredPosition = new Vector2(_popupTextPos.x, _popupRiseDelta * p);
             _popupText.color = new Color(c.r, c.g, c.b, 1f - p);
             yield return null;
         }
 
+        _popupText.rectTransform.anchoredPosition = _popupTextPos;
         _popupText.gameObject.SetActive(false);
         _popupCoroutine = null;
     }

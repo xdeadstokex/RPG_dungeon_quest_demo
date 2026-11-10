@@ -27,15 +27,15 @@ namespace Assets.Scripts.Battle
         public IEnumerator Run(Action<CommandRanting> onDone)
         {
             float t = 0f;
+            float center = _duration * 0.5f;
             while (t < _duration)
             {
                 t += TimeUtils.GetFrameTimeSec();
-                float p = t / _duration;
-                OnProgress?.Invoke(p);
+                OnProgress?.Invoke(t / _duration);
 
                 if (KBInputUtils.KeyEClick())
                 {
-                    float dist = Mathf.Abs(p - 0.5f);
+                    float dist = Mathf.Abs(t - center);
                     if (dist <= _perfect)
                         onDone(CommandRanting.Perfect);
                     else if (dist <= _miss)
