@@ -3,8 +3,11 @@ using Assets.Scripts.Battle;
 using UnityEngine;
 using static GameData;
 
-public class CollisionHandler : MonoBehaviour
-{
+public class CollisionHandler : MonoBehaviour{
+	
+//===============================================
+//==============  SETUP, DATA   =================
+//===============================================
     public enum TriggerType { Click, Enter } 
 
     [SerializeField] private SceneNames _targetScene = SceneNames.None;
@@ -16,20 +19,24 @@ public class CollisionHandler : MonoBehaviour
     public static Collider2D _lastHit;
 
 
-    private void Start()
-    {
-        if (_zoneType != ZoneType.Fight)
-            return;
+//===============================================
+//==============    CORE FUNCS  =================
+//===============================================
+
+    private void Start(){
+        if (_zoneType != ZoneType.Fight){ return; }
 
         //disable this CollisionHandler if it is defeated
         string id = BattleContext.ZoneId(SceneUtils.GetCurrentSceneName(), name);
-        if (BattleContext.ClearedZones.Contains(id))
-            gameObject.SetActive(false);
+        if (BattleContext.ClearedZones.Contains(id)){ gameObject.SetActive(false); }
     }
 
 
-    public static GameObject GetMouseTarget(LayerMask layer)
-    {
+
+//===============================================
+//===============  Public API  ==================
+//===============================================
+    public static GameObject GetMouseTarget(LayerMask layer){
         var mouseWorldPos = MouseInputUtils.MouseWorldPos2D();
         Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, layer);
   
@@ -37,30 +44,31 @@ public class CollisionHandler : MonoBehaviour
     }
 
 
-    public static bool IsInZoneType(Vector2 playerPos, PlayerData data, LayerMask layer, ZoneType type)
-    {
-        var playerBoundBox = data.boxCollider.bounds.size;
-        Collider2D[] hits = Physics2D.OverlapBoxAll(playerPos, playerBoundBox, 0f, layer);
-        Collider2D hitObject = System.Array.Find(hits, h => h.gameObject != data.obj);
+	public static bool IsInZoneType(Vector2 playerPos, PlayerData data, LayerMask layer, ZoneType type){
+		var playerBoundBox = data.boxCollider.bounds.size;
+		Collider2D[] hits = Physics2D.OverlapBoxAll(playerPos, playerBoundBox, 0f, layer);
 
-        if (hitObject == null)
-            return false;
+		bool isInZone = false;
+		for(int i = 0; i < hits.Length; i++){
+			if(hits[i].gameObject == data.obj){ continue; }
 
-        if (!hitObject.TryGetComponent<CollisionHandler>(out var dataScript))
-            return false;
+			CollisionHandler dataScript = hits[i].GetComponent<CollisionHandler>();
+			if(dataScript == null){ continue; }
 
-        return type == dataScript._zoneType;
-    }
+			if(type == dataScript._zoneType){ isInZone = true; }
+		}
 
-    public static string GetZoneName(PlayerData data, LayerMask layer)
-    {
+		return isInZone;
+	}
+
+
+    public static string GetZoneName(PlayerData data, LayerMask layer){
         var playerPos = data.transform.position;
         Collider2D hitObject = Physics2D.OverlapCircle(playerPos, 0.5f, layer);
         return (hitObject != null) ? hitObject.gameObject.name : null;
     }
 
-    public static void TriggerZoneFunction(PlayerData data, LayerMask layer)
-    {
+    public static void TriggerZoneFunction(PlayerData data, LayerMask layer){
         var playerPos = data.transform.position;
         var playerBoundBox = data.boxCollider.bounds.size;
         Collider2D[] hits = Physics2D.OverlapBoxAll(playerPos, playerBoundBox, 0f, layer);
@@ -75,37 +83,26 @@ public class CollisionHandler : MonoBehaviour
         HandlePopup(data, hitObject, true);
         HandleDialog(data, dataScript, hitObject);
 
-        switch (dataScript._zoneType)
-        {
+        switch (dataScript._zoneType){
 
             case ZoneType.Portal:
-                if (inside)
-                {
-                    if (dataScript._triggerType == TriggerType.Click && !PlayerInteractKey())
-                    {
-                        break;
-                    }
+                if (inside){
+                    if(dataScript._triggerType == TriggerType.Click && !PlayerInteractKey()){ break; }
                     CheckChangeScene(dataScript);
                 }
                 break;
 
             case ZoneType.Fight:
-                if (inside)
-                {
-                    if (dataScript._triggerType == TriggerType.Click && !PlayerInteractKey())
-                    {
-                        break;
-                    }
+                if (inside){
+                    if (dataScript._triggerType == TriggerType.Click && !PlayerInteractKey()){ break; }
                     StartFight(dataScript);
                 }
                 break;
 
-
         }
 
     end:
-        if (_lastHit != hitObject)
-        {
+        if (_lastHit != hitObject){
             HandlePopup(data, _lastHit, false);
             _lastHit = hitObject;
         }
@@ -113,13 +110,10 @@ public class CollisionHandler : MonoBehaviour
     }
 
 
-    private static void HandlePopup(PlayerData data, Collider2D obj, bool signal)
-    {
-        if (obj == null)
-            return;
+    private static void HandlePopup(PlayerData data, Collider2D obj, bool signal){
+        if (obj == null){ return; }
 
-        if (obj.TryGetComponent<PopupHandler>(out var popup))
-        {
+        if (obj.TryGetComponent<PopupHandler>(out var popup)){
             popup.FollowObj(data.transform, signal);
             popup.FollowPlayer(data, signal);
             popup.Show(signal);
@@ -127,37 +121,27 @@ public class CollisionHandler : MonoBehaviour
     }
 
 
-    private static void HandleDialog(PlayerData data, CollisionHandler dataScript, Collider2D obj)
-    {
-        if (obj == null)
-            return;
-
-        if (dataScript._zoneType != ZoneType.Dialog)
-            return;
-
-        if (!PlayerInteractKey())
-            return;
-
+    private static void HandleDialog(PlayerData data, CollisionHandler dataScript, Collider2D obj){
+        if (obj == null){ return; }
+        if (dataScript._zoneType != ZoneType.Dialog){ return; }
+        if (!PlayerInteractKey()){ return; }
+		
         if (obj.TryGetComponent<DialogHandler>(out var dialog))
             dialog.Show(data);
     }
 
 
 
-    public static void StartFight(CollisionHandler zone)
-    {
-        if (Time.time < BattleContext.FightCooldownUntil)
-            return;
+    public static void StartFight(CollisionHandler zone){
+        if (Time.time < BattleContext.FightCooldownUntil){ return; }
 
-        if (zone._enemies == null || zone._enemies.Length == 0)
-        {
+        if (zone._enemies == null || zone._enemies.Length == 0){
             Debug.LogWarning("Fight zone '" + zone.name + "' has no enemies assigned");
             return;
         }
 
         List<CharacterData> party = InputController.GetPartyCharacters();
-        if (party.Count == 0)
-        {
+        if (party.Count == 0){
             Debug.LogWarning("No party member has a CharacterData assigned (EntityHandler -> Character)");
             return;
         }
@@ -172,8 +156,7 @@ public class CollisionHandler : MonoBehaviour
     }
 
 
-    public static void CheckChangeScene(CollisionHandler dataScript)
-    {
+    public static void CheckChangeScene(CollisionHandler dataScript){
         string sceneName = dataScript._targetScene.ToString();
         if (sceneName == "None") { return; }
         SceneController.SwitchScene(sceneName);

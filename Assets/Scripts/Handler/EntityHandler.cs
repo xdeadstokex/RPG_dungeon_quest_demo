@@ -10,8 +10,7 @@ using System.Collections.Generic;
 
 
 [System.Serializable]
-public class PlayerData //should be moved
-{
+public class PlayerData{
 	public LayerMask zoneLayer;
 
 	public float popupOffsetX = 0;
@@ -48,8 +47,7 @@ public class PlayerData //should be moved
 
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(Animator))]
-public class EntityHandler : MonoBehaviour
-{
+public class EntityHandler : MonoBehaviour{
     private static Dictionary<string, EntityHandler> _registry = new();
 
     [SerializeField] private string _id;
@@ -62,15 +60,14 @@ public class EntityHandler : MonoBehaviour
     public string Id => string.IsNullOrEmpty(_id) ? "NoName" : _id;
 
 
-    private void Awake()
-    {
-        if (_registry.TryGetValue(Id, out var entity))
-            if (entity != null && entity != this)
-            {
+    private void Awake(){
+        if (_registry.TryGetValue(Id, out var entity)){
+            if (entity != null && entity != this){
                 gameObject.SetActive(false);
                 Destroy(gameObject);
                 return;
             }
+		}
         _registry[Id] = this;
 
 		data.obj = gameObject;
