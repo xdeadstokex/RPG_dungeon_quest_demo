@@ -1,11 +1,10 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static GameData;
 
 
-public class SceneController : MonoBehaviour
-{
+
+public class SceneController : MonoBehaviour{
 	private static SceneController _instance = null;
 
     [SerializeField] private float _minTransitionTime;
@@ -19,8 +18,7 @@ public class SceneController : MonoBehaviour
     public static bool Exists => _instance != null;
 
 
-    private void Awake()
-    {
+    private void Awake(){
         SingletonInit();
 
         _currentTransitionTime = 0f;
@@ -31,10 +29,8 @@ public class SceneController : MonoBehaviour
     }
 
 
-    private void Update()
-    {
-        if (_instance == null)
-            return;
+    private void Update(){
+        if (_instance == null){ return; }
 
         string transitionScene = SceneNames.TransitionScene.ToString();
 

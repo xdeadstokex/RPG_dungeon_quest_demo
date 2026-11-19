@@ -4,7 +4,6 @@ using System.Collections.Generic; // List
 using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static GameData;
 
 public class InputController : MonoBehaviour {
 
@@ -13,7 +12,6 @@ public class InputController : MonoBehaviour {
 //===============================================
     private static InputController _instance = null;
 
-    [SerializeField] private LayerMask _zoneLayer;
     [SerializeField] private List<CharacterData> _allies = new();
 
     private EntityHandler _player;
@@ -28,6 +26,7 @@ public class InputController : MonoBehaviour {
 
     private void Awake(){
         SingletonInit();
+		GlobalData.playerSignalPool.Remap();
     }
 
 
@@ -106,8 +105,9 @@ public class InputController : MonoBehaviour {
     //temp for now
     private void FightSceneProgress(){
         if (SceneUtils.GetCurrentSceneName() != SceneNames.FightScene.ToString()){ return; }
-        if (PlayerEscapeKey())
+        if (GlobalData.PlayerEscapeKey()){
             SceneController.SwitchScene(SceneNames.MainScene.ToString());
+		}
         return;
     }
 
@@ -122,6 +122,5 @@ public class InputController : MonoBehaviour {
             RestorePlayerPosition();
         }
     }
-
 
 }

@@ -1,0 +1,15 @@
+using System;
+
+
+public static class GameData{
+
+static int score = 0;
+
+
+
+}
+
+
+// USE:
+// using static GameData;
+// for skipping the GameData. prefix when calling a static field

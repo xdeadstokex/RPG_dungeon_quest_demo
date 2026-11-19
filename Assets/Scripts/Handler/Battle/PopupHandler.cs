@@ -1,13 +1,8 @@
 ﻿using UnityEngine;
-using static GameData;
 
 public class PopupHandler : MonoBehaviour{
 
-	public enum PopupType{
-		FollowPlayer,
-		FollowObj,
-		ZonePopup
-	}
+
 
 
 	[SerializeField] public GameObject popup = null;
