@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static GameData;
 
 public class DialogHandler : MonoBehaviour {
     [SerializeField] private GameObject _dialogBox;
@@ -26,7 +25,7 @@ public class DialogHandler : MonoBehaviour {
             OnOpened?.Invoke();
         }
 
-        if (PlayerDialogEscapeKey()) {
+        if (GlobalData.PlayerDialogEscapeKey()) {
             _isTyping = false;
             _isOpening = false;
             _currentLine = 0;
@@ -35,7 +34,7 @@ public class DialogHandler : MonoBehaviour {
             return;
         }
 
-        if (!_isStoping && PlayerInteractKey() && !_isTyping) {
+        if (!_isStoping && GlobalData.PlayerInteractKey() && !_isTyping) {
             if (++_currentLine < _lines.Count) {
                 StartCoroutine(TypeDialog(_lines[_currentLine]));
                 return;
@@ -49,7 +48,7 @@ public class DialogHandler : MonoBehaviour {
             }
         }
 
-        if (_isStoping && PlayerInteractKey()) {
+        if (_isStoping && GlobalData.PlayerInteractKey()) {
             _isStoping = false;
             _isOpening = false;
             _isTyping = false;

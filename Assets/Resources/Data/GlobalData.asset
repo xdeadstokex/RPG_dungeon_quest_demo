@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f625986b50fe55fe0aaea001b71afb2e, type: 3}
+  m_Name: GlobalData
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalData
+  _globalLayer:
+    serializedVersion: 2
+    m_Bits: 1073741824
+  _playerEscape:
+    data: 0
+  _playerMoveLeft:
+    data: 0
+  _playerMoveRight:
+    data: 3
+  _playerMoveUp:
+    data: 1
+  _playerMoveDown:
+    data: 2
+  _playerDialogEscape:
+    data: 15
+  _playerInteract:
+    data: 16
+  _playerMenuUp:
+    data: 5
+  _playerMenuDown:
+    data: 6
+  _playerMenuLeft:
+    data: 7
+  _playerMenuRight:
+    data: 8

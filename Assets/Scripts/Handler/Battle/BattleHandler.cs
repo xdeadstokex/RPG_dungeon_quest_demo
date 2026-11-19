@@ -5,12 +5,10 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using static GameData;
 
 
 [RequireComponent(typeof(BattleController))]
-public class BattleHandler : MonoBehaviour, IBattleMenu
-{
+public class BattleHandler : MonoBehaviour, IBattleMenu{
     [SerializeField] private List<Transform> _alliesPosition;
     [SerializeField] private List<Transform> _enemiesPosition;
     [SerializeField] private GameObject _unitPrefab;
@@ -258,7 +256,7 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
         _resultPanel.SetResultText(text);
 
         yield return null;
-        while (!PlayerInteractKey())
+        while (!GlobalData.PlayerInteractKey())
             yield return null;
 
         BattleContext.Finish(winner);
@@ -293,17 +291,17 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
             while (true)
             {
                 _menu.SetPrePickSkill(skillIndex);
-                if (PlayerMenuUp())
+                if (GlobalData.PlayerMenuUpKey())
                 {
                     _menu.UnSetPrePickSkill(skillIndex);
                     skillIndex = (skillIndex - 1 + skills.Count) % skills.Count;
                 }
-                else if (PlayerMenuDown())
+                else if (GlobalData.PlayerMenuDownKey())
                 {
                     _menu.UnSetPrePickSkill(skillIndex);
                     skillIndex = (skillIndex + 1) % skills.Count;
                 }
-                else if (PlayerInteractKey() && actor.Mp >= skills[skillIndex].MpCost)
+                else if (GlobalData.PlayerInteractKey() && actor.Mp >= skills[skillIndex].MpCost)
                     break;
 
                 yield return null;
@@ -323,22 +321,22 @@ public class BattleHandler : MonoBehaviour, IBattleMenu
                 while (true)
                 {
                     SetMarker(candidates[cur], true);
-                    if (PlayerMenuUp() || PlayerMenuLeft())
+                    if (GlobalData.PlayerMenuUpKey() || GlobalData.PlayerMenuLeftKey())
                     {
                         SetMarker(candidates[cur], false);
                         cur = (cur - 1 + candidates.Count) % candidates.Count;
                     }
-                    else if (PlayerMenuDown() || PlayerMenuRight())
+                    else if (GlobalData.PlayerMenuDownKey() || GlobalData.PlayerMenuRightKey())
                     {
                         SetMarker(candidates[cur], false);
                         cur = (cur + 1) % candidates.Count;
                     }
-                    else if (PlayerDialogEscapeKey())
+                    else if (GlobalData.PlayerDialogEscapeKey())
                     {
                         isBack = true;
                         break;
                     }
-                    else if (PlayerInteractKey())
+                    else if (GlobalData.PlayerInteractKey())
                     {
                         picked = candidates[cur];
                         break;

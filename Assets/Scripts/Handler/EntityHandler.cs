@@ -5,14 +5,11 @@ using UnityEngine;
 using System;
 
 using UnityEngine.SceneManagement;
-using static GameData;
 using System.Collections.Generic;
 
 
 [System.Serializable]
 public class PlayerData{
-	public LayerMask zoneLayer;
-
 	public float popupOffsetX = 0;
 	public float popupOffsetY = 0;
 
@@ -80,8 +77,7 @@ public class EntityHandler : MonoBehaviour{
 	}
 
 
-    private void OnDestroy()
-    {
+    private void OnDestroy(){
         if (_registry.TryGetValue(Id, out var entity) && entity == this)
             _registry.Remove(Id);
     }
@@ -93,10 +89,10 @@ public class EntityHandler : MonoBehaviour{
 
         float x = 0f, y = 0f;
 
-        if (PlayerMoveRight())     x =  1f;
-        else if (PlayerMoveLeft()) x = -1f;
-        if (PlayerMoveUp())        y =  1f;
-        else if (PlayerMoveDown()) y = -1f;
+        if (GlobalData.PlayerMoveRightKey())     x =  1f;
+        else if (GlobalData.PlayerMoveLeftKey()) x = -1f;
+        if (GlobalData.PlayerMoveUpKey())        y =  1f;
+        else if (GlobalData.PlayerMoveDownKey()) y = -1f;
 
         float angle;
         bool moving = true;
@@ -126,8 +122,8 @@ public class EntityHandler : MonoBehaviour{
         Vector2 nextX = pos + new Vector2(data.velocity.x * dt, 0f);
         Vector2 nextY = pos + new Vector2(0f, data.velocity.y * dt);
 
-        bool canMoveX = !CollisionHandler.IsInZoneType(nextX, data, data.zoneLayer, ZoneType.Solid);
-        bool canMoveY = !CollisionHandler.IsInZoneType(nextY, data, data.zoneLayer, ZoneType.Solid);
+        bool canMoveX = !CollisionHandler.IsInZoneType(nextX, data, ZoneType.Solid);
+        bool canMoveY = !CollisionHandler.IsInZoneType(nextY, data, ZoneType.Solid);
         //Debug.Log(canMoveX + " " + canMoveY + " " + data.velocity);
 
         //bool canMoveX = !CollisionHandler.IsBlocked(nextX, data);
@@ -144,7 +140,7 @@ public class EntityHandler : MonoBehaviour{
 
         data.wasMoving = moving;
 
-        CollisionHandler.TriggerZoneFunction(this.data, data.zoneLayer);
+        CollisionHandler.TriggerZoneFunction(this.data);
 
         data.anim.SetBool("is_moving", moving);
         if (moving && data.velocity.sqrMagnitude > 0.01f){
